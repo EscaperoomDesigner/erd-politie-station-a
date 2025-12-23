@@ -1,0 +1,100 @@
+extends Node
+
+# GameManager - Central game state management
+# Handles score, timer, player info, and game flow
+
+# Signals
+signal score_changed(new_score: int)
+signal timer_updated(time_left: float)
+signal game_started()
+signal game_ended()
+signal player_name_changed(new_name: String)
+
+# Game state
+var score: int = 0
+var player_name: String = "PLAYER"
+var game_time: float = 0.0
+var is_game_active: bool = false
+
+# Timer
+var timer_running: bool = false
+var time_remaining: float = 0.0
+
+
+func _ready():
+	print("GameManager initialized")
+
+
+func _process(delta: float):
+	if timer_running and time_remaining > 0:
+		time_remaining -= delta
+		timer_updated.emit(time_remaining)
+		
+		if time_remaining <= 0:
+			time_remaining = 0
+			timer_running = false
+			end_game()
+
+
+func start_game():
+	"""Start a new game"""
+	is_game_active = true
+	game_started.emit()
+	print("Game started")
+
+
+func end_game():
+	"""End the current game"""
+	is_game_active = false
+	timer_running = false
+	game_ended.emit()
+	print("Game ended - Final score: ", score)
+	
+	# Publish finish to MQTT if MQTTManager exists
+	if has_node("/root/MQTTManager"):
+		get_node("/root/MQTTManager").publish_finish(score)
+
+
+func reset_game():
+	"""Reset all game state"""
+	score = 0
+	time_remaining = 0.0
+	timer_running = false
+	is_game_active = false
+	score_changed.emit(score)
+	timer_updated.emit(time_remaining)
+	print("Game reset")
+
+
+func add_score(points: int = 1):
+	"""Add points to the score"""
+	if is_game_active:
+		score += points
+		score_changed.emit(score)
+		print("Score added: +%d (Total: %d)" % [points, score])
+	else:
+		print("Cannot add score - game not active")
+
+
+func set_score(new_score: int):
+	"""Set the score directly"""
+	score = new_score
+	score_changed.emit(score)
+
+
+func set_player_name(new_name: String):
+	"""Set the player name"""
+	player_name = new_name
+	player_name_changed.emit(new_name)
+
+
+func start_timer(duration: float):
+	"""Start a countdown timer"""
+	time_remaining = duration
+	timer_running = true
+	timer_updated.emit(time_remaining)
+
+
+func stop_timer():
+	"""Stop the timer"""
+	timer_running = false

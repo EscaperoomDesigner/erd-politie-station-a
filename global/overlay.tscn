@@ -1,0 +1,194 @@
+[gd_scene load_steps=11 format=3 uid="uid://bs4wxj7ljdoq4"]
+
+[ext_resource type="Script" uid="uid://bis6qktm84vox" path="res://global/overlay.gd" id="1_overlay_script"]
+[ext_resource type="FontFile" uid="uid://b04dym8pvwsfa" path="res://assets/fonts/OpenSans-ExtraBold.ttf" id="2_i11gb"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_b1r7g"]
+bg_color = Color(0.2, 0.2, 0.2, 0.8235294)
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_i11gb"]
+bg_color = Color(0.18000486, 0.1800049, 0.18000478, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_l85w2"]
+bg_color = Color(0.92941177, 0.24705882, 0.15294118, 1)
+border_width_bottom = 6
+border_color = Color(0.8086339, 0.18904686, 0.105998494, 1)
+corner_radius_top_left = 32
+corner_radius_top_right = 32
+corner_radius_bottom_right = 32
+corner_radius_bottom_left = 32
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ie0pd"]
+bg_color = Color(0.92941177, 0.24705882, 0.15294118, 1)
+border_width_top = 6
+border_color = Color(0.84705883, 0.58431375, 0.019607844, 0)
+corner_radius_top_left = 32
+corner_radius_top_right = 32
+corner_radius_bottom_right = 32
+corner_radius_bottom_left = 32
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_t2n77"]
+bg_color = Color(0.92941177, 0.24705882, 0.15294118, 1)
+border_width_bottom = 6
+border_color = Color(0.8086339, 0.18904686, 0.105998494, 1)
+corner_radius_top_left = 32
+corner_radius_top_right = 32
+corner_radius_bottom_right = 32
+corner_radius_bottom_left = 32
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_b0y21"]
+bg_color = Color(0.92941177, 0.24705882, 0.15294118, 1)
+border_width_bottom = 6
+border_color = Color(0.8086339, 0.18904686, 0.105998494, 1)
+corner_radius_top_left = 32
+corner_radius_top_right = 32
+corner_radius_bottom_right = 32
+corner_radius_bottom_left = 32
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_y7y22"]
+bg_color = Color(0.92941177, 0.24705882, 0.15294118, 1)
+border_width_top = 6
+border_color = Color(0.84705883, 0.58431375, 0.019607844, 0)
+corner_radius_top_left = 32
+corner_radius_top_right = 32
+corner_radius_bottom_right = 32
+corner_radius_bottom_left = 32
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_gxoe5"]
+bg_color = Color(0.92941177, 0.24705882, 0.15294118, 1)
+border_width_bottom = 6
+border_color = Color(0.8086339, 0.18904686, 0.105998494, 1)
+corner_radius_top_left = 32
+corner_radius_top_right = 32
+corner_radius_bottom_right = 32
+corner_radius_bottom_left = 32
+
+[node name="Overlay" type="CanvasLayer"]
+process_priority = 1
+script = ExtResource("1_overlay_script")
+
+[node name="TopBar" type="Panel" parent="."]
+custom_minimum_size = Vector2(1920, 96)
+anchors_preset = 10
+anchor_right = 1.0
+grow_horizontal = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_styles/panel = SubResource("StyleBoxFlat_b1r7g")
+
+[node name="MarginContainer" type="MarginContainer" parent="TopBar"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 48
+theme_override_constants/margin_right = 48
+
+[node name="HBoxContainer" type="HBoxContainer" parent="TopBar/MarginContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="TeamNameLabel" type="Label" parent="TopBar/MarginContainer/HBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(560, 0)
+layout_mode = 2
+size_flags_horizontal = 2
+size_flags_vertical = 1
+theme_override_font_sizes/font_size = 56
+text = "KoeleKikkers123"
+vertical_alignment = 1
+
+[node name="TimerLabel" type="Label" parent="TopBar/MarginContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 6
+size_flags_vertical = 1
+theme_override_fonts/font = ExtResource("2_i11gb")
+theme_override_font_sizes/font_size = 64
+text = "03:00"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ScoreLabel" type="Label" parent="TopBar/MarginContainer/HBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(560, 0)
+layout_mode = 2
+size_flags_horizontal = 10
+size_flags_vertical = 1
+theme_override_font_sizes/font_size = 60
+text = "0000"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 32
+theme_override_constants/margin_top = 64
+theme_override_constants/margin_right = 32
+theme_override_constants/margin_bottom = 32
+
+[node name="ResetPanel" type="Panel" parent="MarginContainer"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(580, 260)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_styles/panel = SubResource("StyleBoxFlat_i11gb")
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/ResetPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="Label" type="Label" parent="MarginContainer/ResetPanel/MarginContainer"]
+custom_minimum_size = Vector2(548, 228)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 36
+text = "Are you sure you want to reset the game."
+autowrap_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/ResetPanel/MarginContainer"]
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+size_flags_vertical = 8
+
+[node name="ResetYesButton" type="Button" parent="MarginContainer/ResetPanel/MarginContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+theme_override_font_sizes/font_size = 36
+theme_override_styles/normal = SubResource("StyleBoxFlat_l85w2")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_ie0pd")
+theme_override_styles/hover = SubResource("StyleBoxFlat_t2n77")
+text = "Yes"
+
+[node name="ResetNoButton" type="Button" parent="MarginContainer/ResetPanel/MarginContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+theme_override_font_sizes/font_size = 36
+theme_override_styles/normal = SubResource("StyleBoxFlat_b0y21")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_y7y22")
+theme_override_styles/hover = SubResource("StyleBoxFlat_gxoe5")
+text = "No"

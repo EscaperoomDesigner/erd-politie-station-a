@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://c4gj52uke5im3"]
+
+[ext_resource type="Texture2D" uid="uid://buk6j4chthbcg" path="res://assets/politiebg.svg" id="2_rhed7"]
+
+[node name="Background" type="Sprite2D"]
+texture = ExtResource("2_rhed7")
+offset = Vector2(960, 540)

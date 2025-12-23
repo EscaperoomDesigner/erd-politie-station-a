@@ -1,0 +1,156 @@
+extends Node
+
+# Global Configuration Manager
+# Loads station_config.json and provides access to all settings
+
+var config_data: Dictionary = {}
+var config_loaded: bool = false
+
+func _ready():
+	load_config()
+
+func load_config() -> bool:
+	"""Load configuration from station_config.json"""
+	var config_path = "res://station_config.json"
+	
+	# Check if running from exported build (use user:// path)
+	if !FileAccess.file_exists(config_path):
+		config_path = "user://station_config.json"
+	
+	if !FileAccess.file_exists(config_path):
+		print("ConfigManager: No config file found at %s" % config_path)
+		print("ConfigManager: Using default values")
+		_set_defaults()
+		return false
+	
+	var file = FileAccess.open(config_path, FileAccess.READ)
+	if file == null:
+		print("ConfigManager: Failed to open config file")
+		_set_defaults()
+		return false
+	
+	var json_text = file.get_as_text()
+	file.close()
+	
+	var json = JSON.new()
+	var error = json.parse(json_text)
+	
+	if error != OK:
+		print("ConfigManager: Failed to parse config: ", json.get_error_message())
+		_set_defaults()
+		return false
+	
+	config_data = json.data
+	config_loaded = true
+	
+	print("ConfigManager: Loaded configuration from %s" % config_path)
+	_apply_display_settings()
+	return true
+
+
+func _set_defaults():
+	"""Set default configuration values"""
+	config_data = {
+		"mqtt": {
+			"broker_ip": "127.0.0.1",
+			"broker_port": 1883,
+			"auto_connect": true,
+			"use_websocket": false
+		},
+		"device": {
+			"type": "station",
+			"id": "station-b"
+		},
+		"display": {
+			"fullscreen": true,
+			"width": 1080,
+			"height": 1920,
+			"vsync": true
+		},
+		"game": {
+			"default_time": 180,
+			"score_per_trigger": 1
+		},
+		"ir_sensor": {
+			"enabled": true,
+			"gpio_pin": 17,
+			"mode": "mqtt"
+		}
+	}
+
+
+func _apply_display_settings():
+	"""Apply display settings from config"""
+	if !config_data.has("display"):
+		return
+	
+	var display = config_data.display
+	
+	if display.has("fullscreen"):
+		if display.fullscreen:
+			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
+		else:
+			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
+	
+	if display.has("width") and display.has("height"):
+		DisplayServer.window_set_size(Vector2i(display.width, display.height))
+	
+	if display.has("vsync"):
+		if display.vsync:
+			DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_ENABLED)
+		else:
+			DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_DISABLED)
+
+
+# Helper functions to get config values
+func get_mqtt_broker_ip() -> String:
+	return config_data.get("mqtt", {}).get("broker_ip", "127.0.0.1")
+
+func get_mqtt_broker_port() -> int:
+	return config_data.get("mqtt", {}).get("broker_port", 1883)
+
+func get_mqtt_auto_connect() -> bool:
+	return config_data.get("mqtt", {}).get("auto_connect", true)
+
+func get_mqtt_use_websocket() -> bool:
+	return config_data.get("mqtt", {}).get("use_websocket", false)
+
+func get_device_type() -> String:
+	return config_data.get("device", {}).get("type", "station")
+
+func get_device_id() -> String:
+	return config_data.get("device", {}).get("id", "station-b")
+
+func get_default_game_time() -> int:
+	return config_data.get("game", {}).get("default_time", 180)
+
+func get_score_per_trigger() -> int:
+	return config_data.get("game", {}).get("score_per_trigger", 1)
+
+func is_ir_sensor_enabled() -> bool:
+	return config_data.get("ir_sensor", {}).get("enabled", true)
+
+func get_ir_sensor_gpio_pin() -> int:
+	return config_data.get("ir_sensor", {}).get("gpio_pin", 17)
+
+func get_ir_sensor_mode() -> String:
+	return config_data.get("ir_sensor", {}).get("mode", "mqtt")
+
+func get_display_width() -> int:
+	return config_data.get("display", {}).get("width", 1080)
+
+func get_display_height() -> int:
+	return config_data.get("display", {}).get("height", 1920)
+
+func is_fullscreen() -> bool:
+	return config_data.get("display", {}).get("fullscreen", true)
+
+func print_config():
+	"""Print current configuration"""
+	print("\n=== Configuration ===")
+	print("MQTT Broker: %s:%d" % [get_mqtt_broker_ip(), get_mqtt_broker_port()])
+	print("Device: %s (%s)" % [get_device_id(), get_device_type()])
+	print("Display: %dx%d (Fullscreen: %s)" % [get_display_width(), get_display_height(), is_fullscreen()])
+	print("Game Time: %ds" % get_default_game_time())
+	print("IR Sensor: %s (GPIO %d, Mode: %s)" % [is_ir_sensor_enabled(), get_ir_sensor_gpio_pin(), get_ir_sensor_mode()])
+	print("===================\n")

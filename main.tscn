@@ -1,0 +1,14 @@
+[gd_scene load_steps=2 format=3 uid="uid://u517pdxy31w"]
+
+[ext_resource type="PackedScene" uid="uid://bo3qkm2gv7u7v" path="res://scenes/pattern_test.tscn" id="1_pattern"]
+
+[node name="Main" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PatternTest" parent="." instance=ExtResource("1_pattern")]
+layout_mode = 1

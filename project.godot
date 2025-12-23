@@ -11,8 +11,30 @@ config_version=5
 [application]
 
 config/name="politietrailer-cognitiespel"
+run/main_scene="uid://u517pdxy31w"
 config/features=PackedStringArray("4.5", "GL Compatibility")
 config/icon="res://icon.svg"
+
+[autoload]
+
+ConfigManager="*res://global/config_manager.gd"
+QuestionManager="*res://global/question_manager.gd"
+MqttManager="*res://global/mqtt_manager.gd"
+Background="*res://global/background.tscn"
+GameManager="*res://global/game_manager.gd"
+Overlay="*res://global/overlay.tscn"
+
+[display]
+
+window/size/viewport_width=1920
+window/size/viewport_height=1080
+window/size/window_width_override=1920
+window/size/window_height_override=1080
+window/stretch/mode="canvas_items"
+
+[gui]
+
+theme/custom="uid://jdnk88f80sos"
 
 [rendering]
 

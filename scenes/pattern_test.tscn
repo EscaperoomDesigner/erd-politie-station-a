@@ -1,0 +1,319 @@
+[gd_scene load_steps=3 format=3 uid="uid://bo3qkm2gv7u7v"]
+
+[ext_resource type="Script" uid="uid://cg14h5dq1wnry" path="res://scenes/pattern_test.gd" id="1_xh4mn"]
+[ext_resource type="Theme" uid="uid://0xqibaa1v1g1" path="res://assets/keyboard_theme.tres" id="2_ucsc3"]
+
+[node name="PatternTest" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_xh4mn")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 64
+theme_override_constants/margin_top = 64
+theme_override_constants/margin_right = 64
+theme_override_constants/margin_bottom = 64
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+
+[node name="HintLabel" type="Label" parent="MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+text = "Vul de lege vakjes in"
+horizontal_alignment = 1
+
+[node name="SequenceContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 6
+
+[node name="FeedbackLabel" type="Label" parent="MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+horizontal_alignment = 1
+
+[node name="KeyboardContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(1800, 460)
+layout_mode = 2
+size_flags_vertical = 8
+theme = ExtResource("2_ucsc3")
+
+[node name="Title" type="Label" parent="MarginContainer/VBoxContainer/KeyboardContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "Kies een letter:"
+horizontal_alignment = 1
+
+[node name="Row1" type="HBoxContainer" parent="MarginContainer/VBoxContainer/KeyboardContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+alignment = 1
+
+[node name="A" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row1"]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+theme_override_font_sizes/font_size = 64
+text = "A"
+
+[node name="B" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row1"]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+theme_override_font_sizes/font_size = 64
+text = "B"
+
+[node name="C" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row1"]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+theme_override_font_sizes/font_size = 64
+text = "C"
+
+[node name="D" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row1"]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+theme_override_font_sizes/font_size = 64
+text = "D"
+
+[node name="E" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row1"]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+theme_override_font_sizes/font_size = 64
+text = "E"
+
+[node name="F" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row1"]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+theme_override_font_sizes/font_size = 64
+text = "F"
+
+[node name="G" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row1"]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+theme_override_font_sizes/font_size = 64
+text = "G"
+
+[node name="H" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row1"]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+theme_override_font_sizes/font_size = 64
+text = "H"
+
+[node name="I" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row1"]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+theme_override_font_sizes/font_size = 64
+text = "I"
+
+[node name="J" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row1"]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+theme_override_font_sizes/font_size = 64
+text = "J"
+
+[node name="K" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row1"]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+theme_override_font_sizes/font_size = 64
+text = "K"
+
+[node name="L" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row1"]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+theme_override_font_sizes/font_size = 64
+text = "L"
+
+[node name="M" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row1"]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+theme_override_font_sizes/font_size = 64
+text = "M"
+
+[node name="Row2" type="HBoxContainer" parent="MarginContainer/VBoxContainer/KeyboardContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+alignment = 1
+
+[node name="N" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row2"]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+theme_override_font_sizes/font_size = 64
+text = "N"
+
+[node name="O" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row2"]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+theme_override_font_sizes/font_size = 64
+text = "O"
+
+[node name="P" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row2"]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+theme_override_font_sizes/font_size = 64
+text = "P"
+
+[node name="Q" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row2"]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+theme_override_font_sizes/font_size = 64
+text = "Q"
+
+[node name="R" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row2"]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+theme_override_font_sizes/font_size = 64
+text = "R"
+
+[node name="S" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row2"]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+theme_override_font_sizes/font_size = 64
+text = "S"
+
+[node name="T" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row2"]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+theme_override_font_sizes/font_size = 64
+text = "T"
+
+[node name="U" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row2"]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+theme_override_font_sizes/font_size = 64
+text = "U"
+
+[node name="V" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row2"]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+theme_override_font_sizes/font_size = 64
+text = "V"
+
+[node name="W" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row2"]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+theme_override_font_sizes/font_size = 64
+text = "W"
+
+[node name="X" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row2"]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+theme_override_font_sizes/font_size = 64
+text = "X"
+
+[node name="Y" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row2"]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+theme_override_font_sizes/font_size = 64
+text = "Y"
+
+[node name="Z" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row2"]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+theme_override_font_sizes/font_size = 64
+text = "Z"
+
+[node name="Row3" type="HBoxContainer" parent="MarginContainer/VBoxContainer/KeyboardContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+alignment = 1
+
+[node name="0" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row3"]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+theme_override_font_sizes/font_size = 64
+text = "0"
+
+[node name="1" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row3"]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+theme_override_font_sizes/font_size = 64
+text = "1"
+
+[node name="2" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row3"]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+theme_override_font_sizes/font_size = 64
+text = "2"
+
+[node name="3" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row3"]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+theme_override_font_sizes/font_size = 64
+text = "3"
+
+[node name="4" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row3"]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+theme_override_font_sizes/font_size = 64
+text = "4"
+
+[node name="5" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row3"]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+theme_override_font_sizes/font_size = 64
+text = "5"
+
+[node name="6" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row3"]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+theme_override_font_sizes/font_size = 64
+text = "6"
+
+[node name="7" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row3"]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+theme_override_font_sizes/font_size = 64
+text = "7"
+
+[node name="8" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row3"]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+theme_override_font_sizes/font_size = 64
+text = "8"
+
+[node name="9" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row3"]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+theme_override_font_sizes/font_size = 64
+text = "9"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/KeyboardContainer"]
+custom_minimum_size = Vector2(420, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="ResetButton" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/HBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(256, 96)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_colors/font_color = Color(1, 0.2, 0.2, 1)
+theme_override_font_sizes/font_size = 64
+text = "X"
+
+[node name="EnterButton" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/HBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(144, 96)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 1, 0.2, 1)
+theme_override_font_sizes/font_size = 48
+text = "OK"
+
+[node name="NextButton" type="Button" parent="MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+text = "Volgende Vraag"
