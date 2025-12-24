@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://c8k5xm6yl7wvh"]
+[gd_scene load_steps=3 format=3 uid="uid://c8k5xm6yl7wvh"]
 
 [ext_resource type="Script" uid="uid://bw2bnt7s3v64c" path="res://scenes/name_input.gd" id="1_name"]
+[ext_resource type="PackedScene" uid="uid://6plikqhve4at" path="res://scenes/name_buttons.tscn" id="2_buttons"]
 
 [node name="NameInput" type="Control"]
 layout_mode = 3
@@ -35,24 +36,34 @@ offset_bottom = 250.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Title" type="Label" parent="VBoxContainer"]
-layout_mode = 2
-theme_type_variation = &"HeaderLarge"
-text = "Patroonherkenning Test"
-horizontal_alignment = 1
-
 [node name="Spacer1" type="Control" parent="VBoxContainer"]
 custom_minimum_size = Vector2(0, 20)
 layout_mode = 2
 
 [node name="NameLabel" type="Label" parent="VBoxContainer"]
 layout_mode = 2
-text = "Kies je groepsnaam:"
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 96
+text = "KIES GROEPSNAAM"
 horizontal_alignment = 1
 
 [node name="Spacer2" type="Control" parent="VBoxContainer"]
 custom_minimum_size = Vector2(0, 10)
 layout_mode = 2
 
-[node name="ButtonsContainer" type="VBoxContainer" parent="VBoxContainer"]
+[node name="NameButtons" parent="VBoxContainer" instance=ExtResource("2_buttons")]
 layout_mode = 2
+
+[node name="Spacer3" type="Control" parent="VBoxContainer"]
+custom_minimum_size = Vector2(0, 128)
+layout_mode = 2
+
+[node name="TimerProgressBar" type="ProgressBar" parent="VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(1920, 48)
+layout_mode = 2
+size_flags_horizontal = 4
+max_value = 1.0
+step = 0.001
+value = 1.0
+show_percentage = false

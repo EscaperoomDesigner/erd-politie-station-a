@@ -185,7 +185,9 @@ func _load_questions():
 		true,   # single_row = true
 		false,  # dpad_layout
 		true,   # uses_numbers = true
-		[0, 0, 1, 1, 2, 2, 4, 4, 5, 5]  # hint_sequence: Flash each number twice
+		[0, 0, 1, 1, 2, 2, 4, 4, 5, 5],  # hint_sequence: Flash each number twice
+		false,   # hint_show_pairs = true (show 2 at once - each number will blink twice)
+		true    # hint_flash_back = true (hints flash back to white for blink effect)
 	))
 	
 	# Vraag 11: D-pad pattern - Left = Top × Right × Bottom
@@ -224,6 +226,23 @@ func _load_questions():
 		true    # uses_numbers
 	))
 	
+	# Vraag 13: A C B D, H O K M, I K ? ?
+	# Patroon in squares: EACH SQUARE ABCD EFGH IJKL
+	# Hint: Show top row sequence, then bottom row to reveal both patterns
+	all_questions.append(QuestionData.new(
+		"q9",
+		["A", "D", "C", "B", SPACE_MARKER, "E", "H", "G", "F", SPACE_MARKER, "I", "L", "K", ""],
+		[13],
+		["J"],
+		3,
+		"Combineer de patronen in elk vierkant",
+		false,  # vertical_layout
+		false,  # single_row
+		false,  # dpad_layout
+		false,  # uses_numbers
+		[0, 3, 2, 1, 5, 8, 7, 6, 10, -1, 12, 11] 
+	))
+
 	print("Loaded ", all_questions.size(), " questions")
 
 

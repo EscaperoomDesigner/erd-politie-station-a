@@ -1,0 +1,15 @@
+[gd_scene load_steps=2 format=3 uid="uid://6plikqhve4at"]
+
+[ext_resource type="Script" uid="uid://drul7cu71mg6q" path="res://scenes/name_buttons.gd" id="1_buttons"]
+
+[node name="NameButtons" type="VBoxContainer"]
+custom_minimum_size = Vector2(960, 480)
+offset_right = 400.0
+offset_bottom = 100.0
+size_flags_horizontal = 4
+size_flags_vertical = 4
+alignment = 1
+script = ExtResource("1_buttons")
+button_min_width = 480.0
+button_min_height = 96.0
+button_font_size = 64

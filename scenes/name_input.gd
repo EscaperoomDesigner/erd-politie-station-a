@@ -4,57 +4,67 @@ extends Control
 
 signal name_confirmed(player_name: String)
 
-@onready var buttons_container = $VBoxContainer/ButtonsContainer
+@onready var name_buttons = $VBoxContainer/NameButtons
+@onready var timer_progress_bar = %TimerProgressBar
 
-var word_list_1 = [
-	"Snelle", "Slimme", "Sterke", "Stoere", "Dappere", 
-	"Grappige", "Wilde", "Coole", "Vrolijke", "Geweldige"
-]
-
-var word_list_2 = [
-	"Agenten", "Helden", "Champions", "Detectives", "Experts",
-	"Tigers", "Eagles", "Ninjas", "Dragons", "Warriors"
-]
-
-var generated_names: Array[String] = []
+# Timer variables
+var name_timer: float = 10.0
+var time_remaining: float = 10.0
+var timer_active: bool = false
 
 
 func _ready():
 	# Start playing tense music
 	MusicManager.play_tense_music()
 	
-	_generate_names()
-	_create_buttons()
-
-
-func _generate_names():
-	"""Genereer 5 random groepsnamen"""
-	generated_names.clear()
+	# Connect to name_buttons signal
+	if name_buttons:
+		name_buttons.name_selected.connect(_on_name_selected)
 	
-	# Shuffle de lijsten
-	var shuffled_1 = word_list_1.duplicate()
-	var shuffled_2 = word_list_2.duplicate()
-	shuffled_1.shuffle()
-	shuffled_2.shuffle()
-	
-	# Maak 5 unieke combinaties
-	for i in range(5):
-		var name = shuffled_1[i % shuffled_1.size()] + " " + shuffled_2[i % shuffled_2.size()]
-		generated_names.append(name)
+	# Start the timer
+	time_remaining = name_timer
+	timer_active = true
+	if timer_progress_bar:
+		timer_progress_bar.value = 1.0
+		timer_progress_bar.modulate = Color(0.3, 1.0, 0.3)
 
 
-func _create_buttons():
-	"""Maak buttons voor elke groepsnaam"""
-	for name in generated_names:
-		var button = Button.new()
-		button.text = name
-		button.custom_minimum_size = Vector2(0, 60)
-		button.add_theme_font_size_override("font_size", 24)
-		button.pressed.connect(_on_name_selected.bind(name))
-		buttons_container.add_child(button)
+func _process(delta: float):
+	"""Update timer every frame"""
+	if timer_active:
+		time_remaining -= delta
+		
+		# Update progress bar (1.0 = full, 0.0 = empty)
+		if timer_progress_bar:
+			timer_progress_bar.value = time_remaining / name_timer
+			
+			# Change color based on time remaining
+			if time_remaining <= name_timer * 0.25:
+				# Red when less than 25% time left
+				timer_progress_bar.modulate = Color(1.0, 0.3, 0.3)
+			elif time_remaining <= name_timer * 0.5:
+				# Yellow when less than 50% time left
+				timer_progress_bar.modulate = Color(1.0, 1.0, 0.3)
+			else:
+				# Green when more than 50% time left
+				timer_progress_bar.modulate = Color(0.3, 1.0, 0.3)
+		
+		# Time's up! Select random name
+		if time_remaining <= 0:
+			timer_active = false
+			_on_timer_expired()
+
+
+func _on_timer_expired():
+	"""Called when timer runs out - select random name"""
+	if name_buttons:
+		var random_name = name_buttons.get_random_name()
+		if random_name:
+			_on_name_selected(random_name)
 
 
 func _on_name_selected(selected_name: String):
+	timer_active = false
 	GameManager.set_player_name(selected_name)
 	name_confirmed.emit(selected_name)
 	queue_free()

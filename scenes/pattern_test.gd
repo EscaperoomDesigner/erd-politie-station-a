@@ -32,6 +32,7 @@ var hint_timer: float = 0.0
 var current_hint_index: int = 0
 var hint_sequence: Array[int] = []  # Indices of filled boxes to highlight in sequence
 var hint_active: bool = false
+var active_hint_question_id: String = ""  # Track which question the hint belongs to
 
 const NAME_INPUT_SCENE = preload("uid://c8k5xm6yl7wvh")
 const PATTERN_BOX_SCENE = preload("uid://c7kqvp4x7ejyh")
@@ -119,10 +120,14 @@ func load_next_question():
 	feedback_label.text = ""
 	hint_label.text = current_question.hint
 	
-	# Reset hint system
+	# Stop any playing hint sounds from previous question
+	SfxManager.stop_all_sounds()
+	
+	# Reset hint system - CRITICAL: reset timer before starting new question
 	hint_timer = 0.0
 	current_hint_index = 0
 	hint_active = false
+	active_hint_question_id = current_question.question_id
 	_build_hint_sequence()
 	
 	# Start timer
@@ -594,6 +599,10 @@ func _start_hint_sequence():
 
 func _show_next_hint():
 	"""Show the next hint by turning the next filled box green"""
+	# Stop if we've moved to a different question
+	if current_question == null or current_question.question_id != active_hint_question_id:
+		return
+	
 	if current_hint_index >= hint_sequence.size():
 		return  # All hints shown
 	
@@ -608,6 +617,7 @@ func _show_next_hint():
 	
 	if box != null:
 		box.set_hint_color()
+		SfxManager.play_hint_sound()
 	
 	current_hint_index += 1
 	
@@ -624,9 +634,28 @@ func _show_next_hint():
 			
 			if next_box != null:
 				next_box.set_hint_color()
+				SfxManager.play_hint_sound()
 				current_hint_index += 1
 	
-	# Schedule next hint (1 second interval between each green highlight)
+	# If hint_flash_back is enabled, reset the color back to white after a brief delay
+	if current_question != null and current_question.hint_flash_back:
+		await get_tree().create_timer(0.25).timeout
+		# Check if question changed during the delay
+		if current_question == null or current_question.question_id != active_hint_question_id:
+			return
+		if box != null:
+			box.reset_hint_color()
+		# Also reset the second box if we showed pairs
+		if current_question.hint_show_pairs and current_hint_index > 1:
+			var prev_box_index = hint_sequence[current_hint_index - 1]
+			if prev_box_index >= 0 and prev_box_index < sequence_boxes.size():
+				var prev_box = sequence_boxes[prev_box_index] as PatternBox
+				if prev_box != null:
+					prev_box.reset_hint_color()
+	
+	# Schedule next hint (0.5 second interval between each green highlight)
 	if current_hint_index < hint_sequence.size():
-		await get_tree().create_timer(1.0).timeout
-		_show_next_hint()
+		await get_tree().create_timer(0.5).timeout
+		# Double-check we're still on the same question after the delay
+		if current_question != null and current_question.question_id == active_hint_question_id:
+			_show_next_hint()

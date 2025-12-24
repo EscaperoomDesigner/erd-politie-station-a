@@ -17,10 +17,10 @@ func _ready():
 
 func play_tense_music():
 	"""Play the tense background music on loop"""
-	play_music(Constants.tense_music, true)
+	play_music(Constants.tense_music)
 
 
-func play_music(music: AudioStream, loop: bool = true):
+func play_music(music: AudioStream):
 	"""Play background music"""
 	if current_player and current_player.playing:
 		current_player.stop()

@@ -22,6 +22,18 @@ func play_coin_sound():
 	play_sound(Constants.coin_sfx)
 
 
+func play_hint_sound():
+	"""Play the hint sound"""
+	play_sound(Constants.hint_sfx)
+
+
+func stop_all_sounds():
+	"""Stop all currently playing sounds"""
+	for player in audio_players:
+		if player.playing:
+			player.stop()
+
+
 func play_sound(sound: AudioStream):
 	"""Play a sound effect using the next available audio player"""
 	# Get next player in rotation

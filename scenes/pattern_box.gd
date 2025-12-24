@@ -133,6 +133,11 @@ func set_hint_color():
 	label.add_theme_color_override("font_color", Color.GREEN)
 
 
+func reset_hint_color():
+	"""Reset the label color back to white after hint"""
+	label.add_theme_color_override("font_color", filled_text_color)
+
+
 func set_to_filled():
 	"""Verander naar gevulde style"""
 	add_theme_stylebox_override("panel", filled_style)

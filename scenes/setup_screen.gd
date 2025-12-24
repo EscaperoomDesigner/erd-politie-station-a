@@ -90,7 +90,7 @@ func _on_test_button_pressed():
 				"name": "Test Team",
 				"score": 0
 			},
-			"time": 180
+			"time": ConfigManager.get_default_game_time()
 		}
 		var json_payload = JSON.stringify(test_payload)
 		
@@ -108,7 +108,7 @@ func _on_skip_button_pressed():
 	# Set up GameManager with default values
 	GameManager.set_player_name("Test Team")
 	GameManager.set_score(0)
-	GameManager.start_timer(180)
+	GameManager.start_timer(ConfigManager.get_default_game_time())
 	GameManager.start_game()
 	
 	# Change to game scene
