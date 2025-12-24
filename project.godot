@@ -19,10 +19,13 @@ config/icon="res://icon.svg"
 
 ConfigManager="*res://global/config_manager.gd"
 QuestionManager="*res://global/question_manager.gd"
-MqttManager="*res://global/mqtt_manager.gd"
+MQTTManager="*res://global/mqtt_manager.gd"
 Background="*res://global/background.tscn"
 GameManager="*res://global/game_manager.gd"
 Overlay="*res://global/overlay.tscn"
+SfxManager="*res://global/sfx_manager.tscn"
+MusicManager="*res://global/music_manager.tscn"
+Constants="*res://global/constants.gd"
 
 [display]
 

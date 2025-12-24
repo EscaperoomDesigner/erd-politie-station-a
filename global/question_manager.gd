@@ -3,6 +3,8 @@ extends Node
 # QuestionManager - Beheert alle vragen voor de cognitietest
 # Voeg hier gemakkelijk nieuwe vragen toe!
 
+const SPACE_MARKER = "__SPACE__"  # Special marker voor whitespace gaps
+
 var all_questions: Array[QuestionData] = []
 var available_questions: Array[QuestionData] = []
 var current_question_index: int = 0
@@ -21,33 +23,41 @@ func _load_questions():
 	
 	# Vraag 1: M, G, N, G, O, G, _, _
 	# Patroon: Oneven posities = M,N,O,P,Q... / Even posities = altijd G
+	# Hint: Show progressing letters first (M,N,O), then the constant G's
 	all_questions.append(QuestionData.new(
 		"q1",
-		["M", "G", "N", "G", "O", "G", "", ""],
-		[6, 7],
+		["M", "G", SPACE_MARKER, "N", "G", SPACE_MARKER, "O", "G", SPACE_MARKER, "", ""],
+		[9, 10],
 		["P", "G"],
 		1,
-		"Let op het patroon: elke tweede letter is een G"
+		"Let op het patroon: elke tweede letter is een G",
+		false,  # vertical_layout
+		false,  # single_row
+		false,  # dpad_layout
+		false,  # uses_numbers
+		[0, 3, 6, 1, 4, 7]  # hint_sequence: First show M,N,O (0,3,6), then G's (1,4,7)
 	))
 	
 	# Vraag 2: A, C, E, _, I, _
 	# Patroon: Overslaan van 1 letter
 	all_questions.append(QuestionData.new(
 		"q2",
-		["A", "C", "E", "", "I", ""],
-		[3, 5],
-		["G", "K"],
+		["A", "C", "E", "G", "I", ""],
+		[5],
+		["K"],
 		1,
-		"Spring telkens een letter over"
+		"Spring telkens een letter over",
+		false,  # vertical_layout
+		true    # single_row
 	))
 	
 	# Vraag 3: Z, Y, X, _, V, _
 	# Patroon: Alfabetisch achteruit
 	all_questions.append(QuestionData.new(
 		"q3",
-		["Z", "Y", "X", "", "V", ""],
-		[3, 5],
-		["W", "U"],
+		["Z", "Y", SPACE_MARKER, "X", "W", SPACE_MARKER, "V", ""],
+		[7],
+		["U"],
 		1,
 		"Het alfabet achterstevoren"
 	))
@@ -59,14 +69,19 @@ func _load_questions():
 	#           S  L
 	#           O  H
 	#           ?  ?
+	# Hint: Show left column top to bottom, then right column top to bottom
 	all_questions.append(QuestionData.new(
 		"q4",
-		["W", "P", "S", "L", "O", "H", "", ""],
-		[6, 7],
-		["K", "D"],
+		["W", "P", "S", "L", "O", "H", "K", ""],
+		[7],
+		["D"],
 		2,
 		"Lees elke kolom van boven naar beneden",
-		true  # vertical_layout = true
+		true,   # vertical_layout = true
+		false,  # single_row
+		false,  # dpad_layout
+		false,  # uses_numbers
+		[0, 2, 4, 6, 1, 3, 5]  # hint_sequence: Left column (W,S,O,K), then right column (P,L,H)
 	))
 	
 	# SECTIE 2: Herhalings patronen
@@ -75,54 +90,138 @@ func _load_questions():
 	# Patroon: A 1x, B 2x, C 3x, D 4x
 	all_questions.append(QuestionData.new(
 		"q5",
-		["A", "B", "B", "C", "C", "C", "", "", "", ""],
-		[6, 7, 8, 9],
-		["D", "D", "D", "D"],
+		["A", "B", "B", "C", "C", "C", "D", "", "", ""],
+		[7, 8, 9],
+		["D", "D", "D"],
 		2,
 		"Elke letter verschijnt vaker dan de vorige"
 	))
 	
 	# SECTIE 3: Cijfer patronen
 	
-	# Vraag 6: 1, 1, 2, 3, 5, _, 13, _
+	# Vraag 6: 1, 1, 2, 3, 5, _, 13, 21
 	# Patroon: Fibonacci (elke getal is som van vorige twee)
+	# Hint: Show pairs that add up: 1+1=2, then 1+2=3, then 2+3=5, then 3+5=8
 	all_questions.append(QuestionData.new(
 		"q6",
-		["1", "1", "2", "3", "5", "", "13", ""],
-		[5, 7],
-		["8", "21"],
+		["1", "1", "2", "3", "5", "", "13", "21"],
+		[5],
+		["8"],
 		3,
 		"Som van de twee vorige getallen",
 		false,  # vertical_layout
-		false,  # single_row
-		true    # uses_numbers = true
+		true,   # single_row
+		false,  # dpad_layout
+		true,   # uses_numbers
+		[0, 1, 2, 1, 2, 3, 2, 3, 4],  # hint_sequence: Show pairs: 1,1,2 then 1,2,3 then 2,3,5 to reveal pattern
+		true    # hint_show_pairs = show additions in pairs
 	))
 	
 	# Vraag 7: H i j ? en t s r ?
 	# Rij 1 (vooruit): H, i, j, k
 	# Rij 2 (achteruit): t, s, r, q
+	# Hint: Show top row first (H,I,J,K forward), then bottom row (T,S,R backward)
 	all_questions.append(QuestionData.new(
 		"q7",
-		["H", "T", "I", "S", "J", "R", "", ""],
-		[6, 7],
-		["K", "Q"],
+		["H", "T", "I", "S", "J", "R", "K", ""],
+		[7],
+		["Q"],
 		2,
 		"Bovenste rij: vooruit, onderste rij: achteruit",
-		false  # vertical_layout = true
+		false,  # vertical_layout = true
+		false,  # single_row
+		false,  # dpad_layout
+		false,  # uses_numbers
+		[0, 2, 4, 6, 1, 3, 5]  # hint_sequence: Top row (H,I,J,K), then bottom row (T,S,R)
 	))
 	
-	# Vraag 8: egiywuk -> k, u, _, y, _, g, e
+	# Vraag 8: egiywuk -> k, u, w, y, _, g, e
 	# Toon eerst het woord, dan de puzzel (gespiegeld)
+	# Hint: Show pairs simultaneously - both K's, then both U's, etc. (mirror pattern)
 	all_questions.append(QuestionData.new(
 		"q8",
-		["E", "G", "I", "Y", "W", "U", "K", "   ", "K", "U", "", "Y", "", "G", "E"],
-		[10, 12],
-		["W", "I"],
+		["E", "G", "I", "Y", "W", "U", "K", SPACE_MARKER, "K", "U", "W", "Y", "", "G", "E"],
+		[12],
+		["I"],
 		2,
 		"Spiegel het woord naar rechts",
 		false,  # vertical_layout
 		true,   # single_row = true voor één lange rij
-		false   # uses_numbers
+		false,  # dpad_layout
+		false,  # uses_numbers
+		[6, 8, 5, 9, 4, 10, 3, 11, 2, -1, 1, 13, 0, 14],  # hint_sequence: K-K, U-U, W-W, Y-Y, I(alone with -1 marker), G-G, E-E
+		true    # hint_show_pairs = true (show 2 at once, except for I which has -1 marker)
+	))
+	
+	# Vraag 9: C F / T R, H K / O M, M ? / J ?
+	# Patroon in squares: Top row: +3, +2, +3, +2 = C(2), F(5), H(7), K(10), M(12), P(15)
+	# Bottom row: -2, -3, -2, -3 = T(19), R(17), O(14), M(12), J(9), H(7)
+	# Hint: Show top row sequence, then bottom row to reveal both patterns
+	all_questions.append(QuestionData.new(
+		"q9",
+		["C", "T", "F", "R", SPACE_MARKER, "H", "O", "K", "M", SPACE_MARKER, "M", "J", "P", ""],
+		[13],
+		["H"],
+		3,
+		"Zoek het patroon in de rijen van elk vierkant",
+		false,  # vertical_layout
+		false,  # single_row
+		false,  # dpad_layout
+		false,  # uses_numbers
+		[0, 2, 5, 7, 10, 12, 1, 3, 6, 8, 11]  # hint_sequence: Top row (C,F,H,K,M,P), then bottom row (T,R,O,M,J)
+	))
+	
+	# Vraag 10: 3, 5, 7, 9, 11, _
+	# Patroon: +2 elke keer (oneven getallen)
+	# Hint: Flash each number twice to emphasize the +2 pattern
+	all_questions.append(QuestionData.new(
+		"q10",
+		["3", "5", "7", "", "11", "13"],
+		[3],
+		["9"],
+		1,
+		"Telkens +2",
+		false,  # vertical_layout
+		true,   # single_row = true
+		false,  # dpad_layout
+		true,   # uses_numbers = true
+		[0, 0, 1, 1, 2, 2, 4, 4, 5, 5]  # hint_sequence: Flash each number twice
+	))
+	
+	# Vraag 11: D-pad pattern - Left = Top × Right × Bottom
+	# First dpad: 24 = 4 × 3 × 2
+	# Second dpad: 42 = 7 × 2 × 3
+	# Third dpad: ? = 2 × 5 × 4 = 40
+	# Hint: Show each dpad in order: bottom, right, top, left
+	all_questions.append(QuestionData.new(
+		"q11",
+		["4", "24", "3", "2", SPACE_MARKER, "7", "42", "2", "3", SPACE_MARKER, "3", "", "2", "1"],
+		[11],
+		["6"],
+		3,
+		"Links = Boven × Rechts × Beneden",
+		false,  # vertical_layout
+		false,  # single_row
+		true,   # dpad_layout = true
+		true,   # uses_numbers
+		[3, 2, 0, 1, 8, 7, 5, 6, 13, 12, 10]  # hint_sequence: bottom, right, top, left for each dpad
+	))
+	
+	# Vraag 12: Twee rijen - onderste is bovenste × 11
+	# Boven: 3, 5, 8, 4, 1, 9, ?
+	# Onder: 33, 55, 88, 44, 11, 99, 77
+	# Patroon: elk getal boven wordt × 11 (gedupliceerd) onder
+	all_questions.append(QuestionData.new(
+		"q12",
+		["3", "33", "5", "55", "8", "88", "4", "44", "1", "11", "9", "99", "", "77"],
+		[12],
+		["7"],
+		2,
+		"Vergelijk de bovenste en onderste rij",
+		false,  # vertical_layout
+		false,  # single_row
+		false,  # dpad_layout
+		true    # uses_numbers
 	))
 	
 	print("Loaded ", all_questions.size(), " questions")

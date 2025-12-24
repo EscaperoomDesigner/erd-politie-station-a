@@ -65,14 +65,14 @@ func animate_score(new_score: int):
 func _update_score_display(value: float):
 	"""Update the score label during animation"""
 	displayed_score = int(value)
-	score_label.text = "%04d" % displayed_score
+	score_label.text = "€%d" % displayed_score
 
 
 func update_score(score: int):
 	"""Update the score display instantly (no animation)"""
 	displayed_score = score
 	target_score = score
-	score_label.text = "%04d" % score
+	score_label.text = "€%d" % score
 
 
 func update_player_name(player_name: String):

@@ -71,6 +71,11 @@ func add_score(points: int = 1):
 	if is_game_active:
 		score += points
 		score_changed.emit(score)
+		
+		# Play coin sound effect
+		if has_node("/root/SfxManager"):
+			get_node("/root/SfxManager").play_coin_sound()
+		
 		print("Score added: +%d (Total: %d)" % [points, score])
 	else:
 		print("Cannot add score - game not active")

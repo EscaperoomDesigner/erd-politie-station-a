@@ -69,7 +69,8 @@ func _set_defaults():
 		},
 		"game": {
 			"default_time": 180,
-			"score_per_trigger": 1
+			"score_per_trigger": 1,
+			"hint_delay": 15.0
 		},
 		"ir_sensor": {
 			"enabled": true,
@@ -126,6 +127,12 @@ func get_default_game_time() -> int:
 
 func get_score_per_trigger() -> int:
 	return config_data.get("game", {}).get("score_per_trigger", 1)
+
+func get_question_timer() -> float:
+	return config_data.get("game", {}).get("question_timer", 30.0)
+
+func get_hint_delay() -> float:
+	return config_data.get("game", {}).get("hint_delay", 15.0)
 
 func is_ir_sensor_enabled() -> bool:
 	return config_data.get("ir_sensor", {}).get("enabled", true)

@@ -17,22 +17,49 @@ var blank_style: StyleBoxFlat
 var selected_style: StyleBoxFlat
 var filled_style: StyleBoxFlat
 
+# Theme colors
+var blank_text_color: Color = Color(0.5, 0.5, 0.5)
+var filled_text_color: Color = Color.WHITE
+
 
 func _ready():
 	# Get node references
-	label = $Label
-	button = $Button
+	label = $Label if has_node("Label") else null
+	button = $Button if has_node("Button") else null
 	
-	custom_minimum_size = Vector2(70, 70)
-	
-	# Setup styles
-	blank_style = _create_blank_style()
-	selected_style = _create_selected_style()
-	filled_style = _create_filled_style()
+	# Load styles from theme or create defaults
+	_load_theme_styles()
 	
 	# Connect button if it exists
 	if button:
 		button.pressed.connect(_on_button_pressed)
+
+
+
+func _load_theme_styles():
+	"""Load styles from theme or use defaults"""
+	# Try to get styles from theme first
+	if has_theme_stylebox("blank", "PatternBox"):
+		blank_style = get_theme_stylebox("blank", "PatternBox")
+	else:
+		blank_style = _create_blank_style()
+	
+	if has_theme_stylebox("selected", "PatternBox"):
+		selected_style = get_theme_stylebox("selected", "PatternBox")
+	else:
+		selected_style = _create_selected_style()
+	
+	if has_theme_stylebox("filled", "PatternBox"):
+		filled_style = get_theme_stylebox("filled", "PatternBox")
+	else:
+		filled_style = _create_filled_style()
+	
+	# Load colors from theme
+	if has_theme_color("blank_text_color", "PatternBox"):
+		blank_text_color = get_theme_color("blank_text_color", "PatternBox")
+	
+	if has_theme_color("filled_text_color", "PatternBox"):
+		filled_text_color = get_theme_color("filled_text_color", "PatternBox")
 
 
 func setup_as_blank(index: int):
@@ -52,7 +79,7 @@ func setup_as_blank(index: int):
 		filled_style = _create_filled_style()
 	
 	label.text = "?"
-	label.add_theme_color_override("font_color", Color(0.5, 0.5, 0.5))
+	label.add_theme_color_override("font_color", blank_text_color)
 	add_theme_stylebox_override("panel", blank_style)
 	
 	if button:
@@ -76,7 +103,7 @@ func setup_as_filled(index: int, value: String):
 		filled_style = _create_filled_style()
 	
 	label.text = value
-	label.add_theme_color_override("font_color", Color.WHITE)
+	label.add_theme_color_override("font_color", filled_text_color)
 	add_theme_stylebox_override("panel", filled_style)
 	
 	if button:
@@ -96,9 +123,14 @@ func update_value(value: String):
 	"""Update de waarde in het vakje"""
 	label.text = value
 	if value == "?":
-		label.add_theme_color_override("font_color", Color(0.5, 0.5, 0.5))
+		label.add_theme_color_override("font_color", blank_text_color)
 	else:
-		label.add_theme_color_override("font_color", Color.WHITE)
+		label.add_theme_color_override("font_color", filled_text_color)
+
+
+func set_hint_color():
+	"""Set the label color to green for visual hint"""
+	label.add_theme_color_override("font_color", Color.GREEN)
 
 
 func set_to_filled():
@@ -109,7 +141,7 @@ func set_to_filled():
 func reset_to_blank():
 	"""Reset naar lege style"""
 	label.text = "?"
-	label.add_theme_color_override("font_color", Color(0.5, 0.5, 0.5))
+	label.add_theme_color_override("font_color", blank_text_color)
 	add_theme_stylebox_override("panel", blank_style)
 
 

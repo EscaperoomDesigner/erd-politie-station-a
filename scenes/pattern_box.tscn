@@ -1,14 +1,19 @@
-[gd_scene load_steps=2 format=3 uid="uid://c7kqvp4x7ejyh"]
+[gd_scene load_steps=3 format=3 uid="uid://c7kqvp4x7ejyh"]
 
 [ext_resource type="Script" uid="uid://xt0ae4i6s56n" path="res://scenes/pattern_box.gd" id="1_xbf8m"]
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ams2d"]
+
 [node name="PatternBox" type="PanelContainer"]
-custom_minimum_size = Vector2(70, 70)
+custom_minimum_size = Vector2(96, 96)
+theme_override_styles/panel = SubResource("StyleBoxFlat_ams2d")
 script = ExtResource("1_xbf8m")
 
 [node name="Label" type="Label" parent="."]
+custom_minimum_size = Vector2(96, 96)
 layout_mode = 2
-theme_override_font_sizes/font_size = 36
+size_flags_vertical = 1
+theme_override_font_sizes/font_size = 64
 text = "A"
 horizontal_alignment = 1
 vertical_alignment = 1

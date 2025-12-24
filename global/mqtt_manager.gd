@@ -4,6 +4,9 @@ extends Node
 # Manages game start, finish, timer updates, and leaderboard
 # Configuration is loaded from ConfigManager (station_config.json)
 
+# Signals
+signal game_start_received()
+
 # Configuration - loaded from ConfigManager
 var BROKER_IP: String = "192.168.1.2"
 var BROKER_PORT: int = 1883
@@ -110,6 +113,17 @@ func _initialize_device_config():
 
 func connect_to_broker(custom_ip: String = "", custom_port: int = 0):
 	"""Connect to the MQTT broker"""
+	# Check if already connected or connecting
+	if mqtt_client and mqtt_client.brokerconnectmode != 0:  # BCM_NOCONNECTION = 0
+		print("MQTTManager: Already connecting or connected (state: %d)" % mqtt_client.brokerconnectmode)
+		# If already connected, we're done
+		if mqtt_connected:
+			print("MQTTManager: Already connected!")
+			return
+		# If connecting, let it finish
+		print("MQTTManager: Connection attempt already in progress...")
+		return
+	
 	var ip = custom_ip if custom_ip != "" else BROKER_IP
 	var port = custom_port if custom_port != 0 else BROKER_PORT
 	
@@ -231,6 +245,9 @@ func _handle_start_message(payload: String):
 		GameManager.start_game()
 		
 		print("MQTTManager: Game started for team '%s' with %d seconds" % [team_name, time_seconds])
+		
+		# Emit signal for setup screen or other listeners
+		game_start_received.emit()
 
 
 func _handle_timeleft_message(payload: String):

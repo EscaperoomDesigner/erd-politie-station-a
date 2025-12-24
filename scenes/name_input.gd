@@ -20,6 +20,9 @@ var generated_names: Array[String] = []
 
 
 func _ready():
+	# Start playing tense music
+	MusicManager.play_tense_music()
+	
 	_generate_names()
 	_create_buttons()
 

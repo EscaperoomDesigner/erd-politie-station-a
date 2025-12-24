@@ -1,0 +1,81 @@
+[gd_scene load_steps=3 format=3 uid="uid://c8l3yqs7hfmxr"]
+
+[ext_resource type="Script" path="res://scenes/setup_screen.gd" id="1_setup"]
+[ext_resource type="Theme" uid="uid://ccrflf2j14lf5" path="res://assets/politie_theme.tres" id="2_theme"]
+
+[node name="SetupScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_theme")
+script = ExtResource("1_setup")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.1, 0.1, 0.15, 1)
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer"]
+layout_mode = 2
+theme_override_constants/separation = 40
+
+[node name="StatusLabel" type="Label" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "POLITIE COGNITIE SPEL"
+horizontal_alignment = 1
+
+[node name="WaitingLabel" type="Label" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "Wachten op start signaal..."
+horizontal_alignment = 1
+
+[node name="Spacer" type="Control" parent="CenterContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+
+[node name="TestButton" type="Button" parent="CenterContainer/VBoxContainer"]
+custom_minimum_size = Vector2(400, 80)
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+disabled = true
+text = "TEST: Send MQTT Start"
+
+[node name="SkipButton" type="Button" parent="CenterContainer/VBoxContainer"]
+custom_minimum_size = Vector2(400, 80)
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "Start Game (Skip MQTT)"
+
+[node name="ConnectButton" type="Button" parent="CenterContainer/VBoxContainer"]
+custom_minimum_size = Vector2(400, 80)
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Verbinden met MQTT"
+
+[node name="ConnectionLabel" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -40.0
+offset_right = 300.0
+grow_vertical = 0
+theme_override_font_sizes/font_size = 20
+text = "MQTT: Disconnected"
