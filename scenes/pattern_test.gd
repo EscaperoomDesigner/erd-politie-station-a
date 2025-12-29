@@ -32,7 +32,7 @@ var hint_timer: float = 0.0
 var current_hint_index: int = 0
 var hint_sequence: Array[int] = []  # Indices of filled boxes to highlight in sequence
 var hint_active: bool = false
-var active_hint_question_id: String = ""  # Track which question the hint belongs to
+var hint_generation: int = 0  # Increments each question to cancel old hint sequences
 
 const NAME_INPUT_SCENE = preload("uid://c8k5xm6yl7wvh")
 const PATTERN_BOX_SCENE = preload("uid://c7kqvp4x7ejyh")
@@ -94,6 +94,11 @@ func _on_name_confirmed(_player_name: String):
 
 func load_next_question():
 	"""Laad de volgende vraag"""
+	# CRITICAL: Stop any active hint sequences by incrementing generation
+	# This ensures any pending hint timers will abort when they check the generation
+	hint_generation += 1
+	hint_active = false
+	
 	current_question = QuestionManager.get_random_question()
 	
 	if current_question == null:
@@ -122,11 +127,9 @@ func load_next_question():
 	# Stop any playing hint sounds from previous question
 	SfxManager.stop_all_sounds()
 	
-	# Reset hint system - CRITICAL: reset timer before starting new question
+	# Reset hint system
 	hint_timer = 0.0
 	current_hint_index = 0
-	hint_active = false
-	active_hint_question_id = current_question.question_id
 	_build_hint_sequence()
 	
 	# Start timer
@@ -548,17 +551,24 @@ func _check_answer():
 
 
 func _on_timer_expired():
-	"""Called when timer runs out"""
+	"""Called when timer runs out - end game and go to GO screen"""
 	timer_active = false
 	is_answering = true
 	
-	feedback_label.text = "Tijd op! Het juiste antwoord was: " + ", ".join(current_question.correct_answers)
+	feedback_label.text = "Tijd op! De tijd is voorbij."
 	feedback_label.add_theme_color_override("font_color", Color.ORANGE)
+	keyboard_container.visible = false
+	hint_label.text = ""
+	if timer_progress_bar:
+		timer_progress_bar.visible = false
 	
-	# No penalty for timeout, just move to next question
+	# Stop any playing hint sounds
+	SfxManager.stop_all_sounds()
+	
+	# End game and go directly to GO screen (skip memory game)
 	await get_tree().create_timer(1.5).timeout
-	is_answering = false
-	load_next_question()
+	GameManager.end_game()
+	get_tree().change_scene_to_file("res://scenes/go_screen.tscn")
 
 
 func _build_hint_sequence():
@@ -593,13 +603,14 @@ func _start_hint_sequence():
 	
 	hint_active = true
 	current_hint_index = 0
-	_show_next_hint()
+	var generation = hint_generation  # Capture current generation
+	_show_next_hint(generation)
 
 
-func _show_next_hint():
+func _show_next_hint(generation: int):
 	"""Show the next hint by turning the next filled box green"""
-	# Stop if we've moved to a different question
-	if current_question == null or current_question.question_id != active_hint_question_id:
+	# Stop if we've moved to a different question (generation changed)
+	if current_question == null or generation != hint_generation:
 		return
 	
 	if current_hint_index >= hint_sequence.size():
@@ -640,7 +651,7 @@ func _show_next_hint():
 	if current_question != null and current_question.hint_flash_back:
 		await get_tree().create_timer(0.25).timeout
 		# Check if question changed during the delay
-		if current_question == null or current_question.question_id != active_hint_question_id:
+		if current_question == null or generation != hint_generation:
 			return
 		if box != null:
 			box.reset_hint_color()
@@ -656,5 +667,5 @@ func _show_next_hint():
 	if current_hint_index < hint_sequence.size():
 		await get_tree().create_timer(0.5).timeout
 		# Double-check we're still on the same question after the delay
-		if current_question != null and current_question.question_id == active_hint_question_id:
-			_show_next_hint()
+		if current_question != null and generation == hint_generation:
+			_show_next_hint(generation)
