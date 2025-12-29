@@ -97,7 +97,7 @@ func load_next_question():
 	current_question = QuestionManager.get_random_question()
 	
 	if current_question == null:
-		# Game finished - transition to GO screen
+		# Game finished - transition to memory game
 		feedback_label.text = "Test voltooid! Alle vragen beantwoord.\nJe score: €" + str(GameManager.score)
 		feedback_label.add_theme_color_override("font_color", Color.GOLD)
 		keyboard_container.visible = false
@@ -105,11 +105,10 @@ func load_next_question():
 		timer_active = false
 		if timer_progress_bar:
 			timer_progress_bar.visible = false
-		GameManager.end_game()
+		# Don't end game yet - continue to memory game
 		
-		# Wait 2 seconds to show final score, then go to GO screen
-		await get_tree().create_timer(2.0).timeout
-		get_tree().change_scene_to_file("res://scenes/go_screen.tscn")
+		# Go instantly to memory game (it's part of the game flow)
+		get_tree().change_scene_to_file("res://memory_game/memory_game.tscn")
 		return
 	
 	user_answers.clear()

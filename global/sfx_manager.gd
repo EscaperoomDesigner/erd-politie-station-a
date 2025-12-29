@@ -27,6 +27,19 @@ func play_hint_sound():
 	play_sound(Constants.hint_sfx)
 
 
+func play_success():
+	"""Play the success sound"""
+	play_sound(Constants.success_sfx)
+
+func play_wrong_memory():
+	"""Play the wrong memory sound"""
+	play_sound(Constants.wrong_memory_sfx)
+
+func play_click():
+	"""Play the click sound"""
+	play_sound(Constants.click_sfx)
+
+
 func stop_all_sounds():
 	"""Stop all currently playing sounds"""
 	for player in audio_players:
