@@ -101,7 +101,7 @@ func _load_questions():
 	
 	# Vraag 6: 1, 1, 2, 3, 5, _, 13, 21
 	# Patroon: Fibonacci (elke getal is som van vorige twee)
-	# Hint: Show pairs that add up: 1+1=2, then 1+2=3, then 2+3=5, then 3+5=8
+	# Hint: Show pairs that add up: 1+1 (green), 1+2 (cyan), 2+3 (yellow), 3+5 (magenta)
 	all_questions.append(QuestionData.new(
 		"q6",
 		["1", "1", "2", "3", "5", "", "13", "21"],
@@ -113,8 +113,8 @@ func _load_questions():
 		true,   # single_row
 		false,  # dpad_layout
 		true,   # uses_numbers
-		[0, 1, 2, 1, 2, 3, 2, 3, 4],  # hint_sequence: Show pairs: 1,1,2 then 1,2,3 then 2,3,5 to reveal pattern
-		true    # hint_show_pairs = show additions in pairs
+		[0, 1, 1, 2, 2, 3, 3, 4],  # hint_sequence: Show pairs: 1+1 (green), 1+2 (cyan), 2+3 (yellow), 3+5 (magenta)
+		true    # hint_show_pairs = show additions in pairs with different colors
 	))
 	
 	# Vraag 7: H i j ? en t s r ?

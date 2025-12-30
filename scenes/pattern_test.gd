@@ -31,6 +31,8 @@ var hint_delay: float = 15.0
 var hint_timer: float = 0.0
 var current_hint_index: int = 0
 var hint_sequence: Array[int] = []  # Indices of filled boxes to highlight in sequence
+var hint_color_index: int = 0  # Current color index for cycling through colors
+var hint_colors: Array[Color] = [Color.GREEN, Color.CYAN, Color.YELLOW, Color.MAGENTA, Color.ORANGE]  # Colors to cycle through
 var hint_active: bool = false
 var hint_generation: int = 0  # Increments each question to cancel old hint sequences
 
@@ -42,6 +44,11 @@ func _ready():
 	question_timer = ConfigManager.get_question_timer()
 	hint_delay = ConfigManager.get_hint_delay()
 	time_remaining = question_timer
+	
+	# Connect to GameManager signals
+	if GameManager:
+		GameManager.game_ended.connect(_on_game_time_expired)
+	
 	_show_name_input()
 
 
@@ -88,6 +95,7 @@ func _on_name_confirmed(_player_name: String):
 	"""Start de test nadat naam is ingevuld"""
 	visible = true
 	GameManager.start_game()  # Start de game
+	GameManager.start_timer(ConfigManager.get_default_game_time())  # Start countdown timer
 	_setup_keyboard()
 	load_next_question()
 
@@ -551,23 +559,27 @@ func _check_answer():
 
 
 func _on_timer_expired():
-	"""Called when timer runs out - end game and go to GO screen"""
+	"""Called when question timer runs out - move to next question"""
 	timer_active = false
-	is_answering = true
-	
-	feedback_label.text = "Tijd op! De tijd is voorbij."
-	feedback_label.add_theme_color_override("font_color", Color.ORANGE)
-	keyboard_container.visible = false
-	hint_label.text = ""
-	if timer_progress_bar:
-		timer_progress_bar.visible = false
 	
 	# Stop any playing hint sounds
 	SfxManager.stop_all_sounds()
 	
-	# End game and go directly to GO screen (skip memory game)
-	await get_tree().create_timer(1.5).timeout
-	GameManager.end_game()
+	# Check if GameManager timer is still running
+	if GameManager.timer_running:
+		# Move to next question immediately
+		load_next_question()
+	else:
+		# Game time is up, end game
+		_on_game_time_expired()
+
+
+func _on_game_time_expired():
+	"""Called when the total game time expires - end game and go to GO screen"""
+	# Stop any playing hint sounds
+	SfxManager.stop_all_sounds()
+	
+	# Go directly to GO screen
 	get_tree().change_scene_to_file("res://scenes/go_screen.tscn")
 
 
@@ -603,6 +615,7 @@ func _start_hint_sequence():
 	
 	hint_active = true
 	current_hint_index = 0
+	hint_color_index = 0  # Reset color cycling
 	var generation = hint_generation  # Capture current generation
 	_show_next_hint(generation)
 
@@ -625,8 +638,11 @@ func _show_next_hint(generation: int):
 	
 	var box = sequence_boxes[box_index] as PatternBox
 	
+	# Get current color for this hint
+	var current_color = hint_colors[hint_color_index % hint_colors.size()]
+	
 	if box != null:
-		box.set_hint_color()
+		box.set_hint_color(current_color)
 		SfxManager.play_hint_sound()
 	
 	current_hint_index += 1
@@ -643,9 +659,14 @@ func _show_next_hint(generation: int):
 			var next_box = sequence_boxes[next_box_index] as PatternBox
 			
 			if next_box != null:
-				next_box.set_hint_color()
+				next_box.set_hint_color(current_color)  # Use same color for the pair
 				SfxManager.play_hint_sound()
 				current_hint_index += 1
+				# Increment color index after showing a pair
+				hint_color_index += 1
+	else:
+		# Increment color index after showing single item (when not pairing)
+		hint_color_index += 1
 	
 	# If hint_flash_back is enabled, reset the color back to white after a brief delay
 	if current_question != null and current_question.hint_flash_back:

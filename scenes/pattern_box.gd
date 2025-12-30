@@ -128,9 +128,9 @@ func update_value(value: String):
 		label.add_theme_color_override("font_color", filled_text_color)
 
 
-func set_hint_color():
-	"""Set the label color to green for visual hint"""
-	label.add_theme_color_override("font_color", Color.GREEN)
+func set_hint_color(color: Color = Color.GREEN):
+	"""Set the label color to specified color for visual hint"""
+	label.add_theme_color_override("font_color", color)
 
 
 func reset_hint_color():
