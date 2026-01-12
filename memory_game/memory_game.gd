@@ -314,7 +314,6 @@ func pattern_completed():
 	if completed_patterns.size() == num_patterns:
 		# Award points for completion
 		if is_3x3_mode:
-			SfxManager.play_success()  # Play success sound
 			GameManager.add_score(POINTS_3X3)
 			completions_3x3 += 1
 			print("3x3 completion count: ", completions_3x3)
@@ -332,7 +331,6 @@ func pattern_completed():
 				reset_to_face_up()
 				return
 		else:
-			SfxManager.play_success()  # Play success sound
 			GameManager.add_score(POINTS_4X4)
 			# Reset failure counter on successful 4x4 completion
 			failures_4x4 = 0

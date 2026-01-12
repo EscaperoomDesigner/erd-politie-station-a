@@ -549,11 +549,11 @@ func _check_answer():
 			break
 	
 	if correct:
-		feedback_label.text = "Correct!"
+		feedback_label.text = "Goed!"
 		feedback_label.add_theme_color_override("font_color", Color.GREEN)
 		GameManager.add_score(100)
 	else:
-		feedback_label.text = "Fout! Het juiste antwoord was: " + ", ".join(current_question.correct_answers)
+		feedback_label.text = "Fout!"
 		feedback_label.add_theme_color_override("font_color", Color.RED)
 		# Play wrong sound effect
 		SfxManager.play_sound(Constants.wrong_sfx)

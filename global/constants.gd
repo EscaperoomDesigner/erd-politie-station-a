@@ -2,14 +2,12 @@ extends Node
 
 const MONEY_SFX_PATH = "res://assets/sfx/coin_sfx.mp3"
 const HINT_SFX_PATH = "res://assets/sfx/hint_sfx.mp3"
-const TENSE_MUSIC_PATH = "res://assets/music/tensemusic.mp3"
+const TENSE_MUSIC_PATH = "res://assets/music/tensemusic_4min.mp3"
 
 # Preloaded assets
 var coin_sfx = preload("res://assets/sfx/coin_sfx.mp3")
 var hint_sfx = preload("res://assets/sfx/hint_sfx.mp3")
-var tense_music = preload("res://assets/music/tensemusic.mp3")
+var tense_music = preload("res://assets/music/tensemusic_4min.mp3")
 var wrong_sfx = preload("res://assets/sfx/wrong_sfx.mp3")
 
-var success_sfx = preload("res://memory_game/sfx/success.mp3")
-var wrong_memory_sfx = preload("res://memory_game/sfx/wrong.mp3")
 var click_sfx = preload("res://memory_game/sfx/click.wav")
