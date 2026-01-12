@@ -4,7 +4,6 @@ extends Node2D
 # Remember pattern positions and match tiles of the same pattern
 
 # CONFIGURATION CONSTANTS
-const TIMER_STANDALONE = 120.0  # Timer for standalone mode
 const GRID_3X3_SIZE = 3  # Grid size for 3x3 mode
 const GRID_4X4_SIZE = 4  # Grid size for 4x4 mode
 const NUM_PATTERNS_3X3 = 3  # Number of different patterns in 3x3 mode
@@ -18,7 +17,6 @@ const FAILURES_BEFORE_DOWNGRADE = 3  # Number of failures in 4x4 before downgrad
 @onready var grid_container = %GridContainer
 
 var is_game_active: bool = false
-var game_timer: float = 120.0
 var tiles: Array = []  # Array of tile buttons
 var tile_patterns: Array = []  # Pattern ID for each tile (0-3)
 var tiles_face_up: bool = true  # Are tiles showing patterns?
@@ -44,6 +42,9 @@ var rounded_corner_material: ShaderMaterial  # Will be set from first TextureRec
 func _ready():
 	# Build pattern textures array from exported textures
 	pattern_textures = [pattern_texture_1, pattern_texture_2, pattern_texture_3, pattern_texture_4]
+	
+	# Connect to GameManager's game_ended signal
+	GameManager.game_ended.connect(_on_game_end)
 	
 	# Get all tile panels from the grid (should be 16 panels)
 	for child in grid_container.get_children():
@@ -89,19 +90,9 @@ func _ready():
 	_on_game_start()
 
 
-func _process(delta):
-	if is_game_active:
-		game_timer -= delta
-		
-		if game_timer <= 0:
-			game_timer = 0
-			_on_game_end()
-
-
 func _on_game_start():
 	"""Game start logic"""
 	is_game_active = true
-	game_timer = TIMER_STANDALONE
 	# Don't reset score - continue from question round
 	
 	tiles_face_up = true
@@ -139,21 +130,19 @@ func _on_game_end():
 	for tile in tiles:
 		tile.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	
-	# Award time bonus
-	var time_remaining = int(game_timer)
+	# Award time bonus based on GameManager's remaining time
+	var time_remaining = int(GameManager.time_remaining)
 	var time_bonus = time_remaining * TIME_BONUS_MULTIPLIER
 	if time_bonus > 0:
 		GameManager.add_score(time_bonus)
 	
-	# End the game and go to GO screen
-	GameManager.end_game()
+	# Go to GO screen (GameManager.end_game() is already called by GameManager itself)
 	get_tree().change_scene_to_file("res://scenes/go_screen.tscn")
 
 
 func _on_game_reset():
 	"""Game reset logic - just stops the game without resetting score"""
 	is_game_active = false
-	game_timer = TIMER_STANDALONE
 	
 	tiles_face_up = false
 	current_matching_pattern = -1

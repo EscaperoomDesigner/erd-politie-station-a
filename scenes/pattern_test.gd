@@ -35,6 +35,8 @@ var hint_color_index: int = 0  # Current color index for cycling through colors
 var hint_colors: Array[Color] = [Color.GREEN, Color.CYAN, Color.YELLOW, Color.MAGENTA, Color.ORANGE]  # Colors to cycle through
 var hint_active: bool = false
 var hint_generation: int = 0  # Increments each question to cancel old hint sequences
+var hint_group_counter: int = 0  # Tracks how many hints shown in current group
+var hint_current_group_index: int = 0  # Which group we're in (for hint_color_groups)
 
 const NAME_INPUT_SCENE = preload("uid://c8k5xm6yl7wvh")
 const PATTERN_BOX_SCENE = preload("uid://c7kqvp4x7ejyh")
@@ -423,6 +425,9 @@ func _on_letter_pressed(letter: String):
 	if selected_blank_index < 0 or selected_blank_index >= current_question.blank_positions.size():
 		return  # Geen vakje geselecteerd
 	
+	# Play click sound when selecting a letter/number
+	SfxManager.play_click()
+	
 	var blank_pos = current_question.blank_positions[selected_blank_index]
 	var box = sequence_boxes[blank_pos] as PatternBox
 	
@@ -550,6 +555,8 @@ func _check_answer():
 	else:
 		feedback_label.text = "Fout! Het juiste antwoord was: " + ", ".join(current_question.correct_answers)
 		feedback_label.add_theme_color_override("font_color", Color.RED)
+		# Play wrong sound effect
+		SfxManager.play_sound(Constants.wrong_sfx)
 		# No negative points - just move to next question
 	
 	# Wacht 1.5 seconden en ga dan naar volgende vraag
@@ -616,6 +623,8 @@ func _start_hint_sequence():
 	hint_active = true
 	current_hint_index = 0
 	hint_color_index = 0  # Reset color cycling
+	hint_group_counter = 0  # Reset group counter
+	hint_current_group_index = 0  # Reset group index
 	var generation = hint_generation  # Capture current generation
 	_show_next_hint(generation)
 
@@ -639,13 +648,45 @@ func _show_next_hint(generation: int):
 	var box = sequence_boxes[box_index] as PatternBox
 	
 	# Get current color for this hint
-	var current_color = hint_colors[hint_color_index % hint_colors.size()]
+	# Cycle colors for questions that need it (q6 for Fibonacci, q5 for repeating letters)
+	var color_to_use = 0  # Default to first color
+	
+	# Check if hint_color_groups is defined (for grouped color changes like d-pad)
+	if current_question != null and not current_question.hint_color_groups.is_empty():
+		color_to_use = hint_color_index % hint_colors.size()
+	elif current_question != null and (current_question.question_id == "q6" or current_question.hint_color_per_value):
+		color_to_use = hint_color_index % hint_colors.size()
+	
+	var current_color = hint_colors[color_to_use]
 	
 	if box != null:
 		box.set_hint_color(current_color)
 		SfxManager.play_hint_sound()
 	
+	# Check if we need to increment color for next hint (for hint_color_per_value mode)
+	var should_increment_color = false
+	if current_question != null and current_question.hint_color_per_value:
+		# Check if the next box has a different value
+		if current_hint_index + 1 < hint_sequence.size():
+			var next_index = hint_sequence[current_hint_index + 1]
+			if next_index >= 0 and next_index < current_question.sequence.size():
+				var current_value = current_question.sequence[box_index]
+				var next_value = current_question.sequence[next_index]
+				if current_value != next_value:
+					should_increment_color = true
+	
 	current_hint_index += 1
+	hint_group_counter += 1
+	
+	# Check if we need to advance to next color group (for hint_color_groups mode)
+	if current_question != null and not current_question.hint_color_groups.is_empty():
+		if hint_current_group_index < current_question.hint_color_groups.size():
+			var group_size = current_question.hint_color_groups[hint_current_group_index]
+			if hint_group_counter >= group_size:
+				# Move to next group
+				hint_current_group_index += 1
+				hint_group_counter = 0
+				hint_color_index += 1
 	
 	# Skip the -1 marker if present
 	if force_single:
@@ -662,10 +703,16 @@ func _show_next_hint(generation: int):
 				next_box.set_hint_color(current_color)  # Use same color for the pair
 				SfxManager.play_hint_sound()
 				current_hint_index += 1
-				# Increment color index after showing a pair
-				hint_color_index += 1
+				# Only increment color index for Fibonacci question (q6)
+				if current_question != null and current_question.question_id == "q6":
+					hint_color_index += 1
 	else:
-		# Increment color index after showing single item (when not pairing)
+		# Only increment color index for Fibonacci question (q6)
+		if current_question != null and current_question.question_id == "q6":
+			hint_color_index += 1
+	
+	# Increment color for hint_color_per_value mode
+	if should_increment_color:
 		hint_color_index += 1
 	
 	# If hint_flash_back is enabled, reset the color back to white after a brief delay

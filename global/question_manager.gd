@@ -88,13 +88,22 @@ func _load_questions():
 	
 	# Vraag 5: A, B, B, C, C, C, _, _, _, _
 	# Patroon: A 1x, B 2x, C 3x, D 4x
+	# Hint: Show each unique letter with a different color (A=color1, B=color2, C=color3, D=color4)
 	all_questions.append(QuestionData.new(
 		"q5",
 		["A", "B", "B", "C", "C", "C", "D", "", "", ""],
 		[7, 8, 9],
 		["D", "D", "D"],
 		2,
-		"Elke letter verschijnt vaker dan de vorige"
+		"Elke letter verschijnt vaker dan de vorige",
+		false,  # vertical_layout
+		false,  # single_row
+		false,  # dpad_layout
+		false,  # uses_numbers
+		[0, 1, 2, 3, 4, 5, 6],  # hint_sequence: Show all in order
+		false,  # hint_show_pairs
+		false,  # hint_flash_back
+		true    # hint_color_per_value = change color when value changes
 	))
 	
 	# SECTIE 3: Cijfer patronen
@@ -193,8 +202,8 @@ func _load_questions():
 	# Vraag 11: D-pad pattern - Left = Top × Right × Bottom
 	# First dpad: 24 = 4 × 3 × 2
 	# Second dpad: 42 = 7 × 2 × 3
-	# Third dpad: ? = 2 × 5 × 4 = 40
-	# Hint: Show each dpad in order: bottom, right, top, left
+	# Third dpad: ? = 3 × 2 × 1 = 6
+	# Hint: Show operands (bottom, right, top) in green, then result (center) in different color
 	all_questions.append(QuestionData.new(
 		"q11",
 		["4", "24", "3", "2", SPACE_MARKER, "7", "42", "2", "3", SPACE_MARKER, "3", "", "2", "1"],
@@ -206,7 +215,11 @@ func _load_questions():
 		false,  # single_row
 		true,   # dpad_layout = true
 		true,   # uses_numbers
-		[3, 2, 0, 1, 8, 7, 5, 6, 13, 12, 10]  # hint_sequence: bottom, right, top, left for each dpad
+		[3, 2, 0, 1, 8, 7, 5, 6, 13, 12, 10],  # hint_sequence: bottom, right, top, center for each dpad
+		false,  # hint_show_pairs
+		false,  # hint_flash_back
+		false,  # hint_color_per_value
+		[3, 1, 3, 1, 3]  # hint_color_groups: 3 operands (green), 1 result (cyan), repeat for each dpad
 	))
 	
 	# Vraag 12: Twee rijen - onderste is bovenste × 11
