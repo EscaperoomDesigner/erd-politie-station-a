@@ -222,11 +222,16 @@ func _handle_start_message(payload: String):
 	"""Handle game start message from server
 	Format: {"team":{"name": "BadassTeam", "score": 1200}, "time": 180}
 	"""
+	print("MQTTManager: Raw payload bytes: ", payload.to_utf8_buffer())
+	print("MQTTManager: Payload length: ", payload.length())
+	
 	var json = JSON.new()
 	var error = json.parse(payload)
 	
 	if error != OK:
-		print("MQTTManager: Failed to parse start message")
+		print("MQTTManager: Failed to parse start message. Error code: ", error)
+		print("MQTTManager: Error at line: ", json.get_error_line())
+		print("MQTTManager: Error message: ", json.get_error_message())
 		return
 	
 	var data = json.data
