@@ -31,6 +31,20 @@ pattern_texture_2 = ExtResource("4_4n7l6")
 pattern_texture_3 = ExtResource("5_apm2w")
 pattern_texture_4 = ExtResource("6_xfvfm")
 
+[node name="HintLabel" type="Label" parent="."]
+unique_name_in_owner = true
+z_index = 100
+offset_left = 815.0
+offset_top = 96.0
+offset_right = 1105.0
+offset_bottom = 184.0
+size_flags_horizontal = 4
+theme_override_colors/font_color = Color(1, 0.8, 0, 1)
+theme_override_font_sizes/font_size = 64
+text = "MEMORY"
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="CenterContainer" type="CenterContainer" parent="."]
 custom_minimum_size = Vector2(1920, 1080)
 offset_right = 1920.0

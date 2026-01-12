@@ -15,6 +15,7 @@ const NUM_3X3_ROUNDS = 2  # Number of 3x3 rounds before switching to 4x4
 const FAILURES_BEFORE_DOWNGRADE = 3  # Number of failures in 4x4 before downgrading to 3x3
 
 @onready var grid_container = %GridContainer
+@onready var hint_label = %HintLabel
 
 var is_game_active: bool = false
 var tiles: Array = []  # Array of tile buttons
@@ -27,6 +28,11 @@ var is_3x3_mode: bool = true  # Start with 3x3 grid
 var completions_3x3: int = 0  # Track consecutive successful completions of 3x3
 var failures_4x4: int = 0  # Track failures on 4x4 mode
 var tiles_per_pattern: int = 3  # Number of tiles per pattern (3 for 3x3, 4 for 4x4)
+
+# Hint system variables
+var hint_timer: Timer = null
+var has_shown_hint_before: bool = false  # Track if hint has been shown in this session
+var first_game_started: bool = false  # Track if this is the first game
 
 # Textures set in editor
 @export var hidden_texture: Texture  # Texture for card back (when flipped)
@@ -42,6 +48,17 @@ var rounded_corner_material: ShaderMaterial  # Will be set from first TextureRec
 func _ready():
 	# Build pattern textures array from exported textures
 	pattern_textures = [pattern_texture_1, pattern_texture_2, pattern_texture_3, pattern_texture_4]
+	
+	# Setup hint timer
+	hint_timer = Timer.new()
+	hint_timer.one_shot = true
+	hint_timer.wait_time = 5.0
+	hint_timer.timeout.connect(_on_hint_timer_timeout)
+	add_child(hint_timer)
+	
+	# Hide hint initially
+	if hint_label:
+		hint_label.visible = false
 	
 	# Connect to GameManager's game_ended signal
 	GameManager.game_ended.connect(_on_game_end)
@@ -120,6 +137,11 @@ func _on_game_start():
 	
 	# Generate initial layout
 	generate_new_layout()
+	
+	# Start hint timer only on first game
+	if not first_game_started:
+		first_game_started = true
+		start_hint_timer()
 
 
 func _on_game_end():
@@ -241,6 +263,9 @@ func _on_tile_gui_input(event: InputEvent, tile_index: int):
 	# Only respond to mouse button press
 	if not (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT):
 		return
+	
+	# Hide hint and stop timer when player touches any button
+	hide_hint()
 	
 	# Play click sound
 	SfxManager.play_click()
@@ -458,3 +483,25 @@ func switch_to_3x3():
 	
 	# Generate new 3x3 layout
 	generate_new_layout()
+
+
+func start_hint_timer():
+	"""Start the hint timer"""
+	if hint_timer and not has_shown_hint_before:
+		hint_timer.start()
+
+
+func _on_hint_timer_timeout():
+	"""Show hint when timer expires"""
+	if not has_shown_hint_before and hint_label:
+		hint_label.visible = true
+		has_shown_hint_before = true
+
+
+func hide_hint():
+	"""Hide the hint and stop the timer"""
+	if hint_timer:
+		hint_timer.stop()
+	if hint_label:
+		hint_label.visible = false
+	has_shown_hint_before = true

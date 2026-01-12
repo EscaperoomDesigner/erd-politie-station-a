@@ -63,6 +63,7 @@ func _create_buttons():
 
 func _on_button_pressed(selected_name: String):
 	"""Emit signal when a name is selected"""
+	SfxManager.play_click()
 	name_selected.emit(selected_name)
 
 
