@@ -33,6 +33,7 @@ var tiles_per_pattern: int = 3  # Number of tiles per pattern (3 for 3x3, 4 for 
 var hint_timer: Timer = null
 var has_shown_hint_before: bool = false  # Track if hint has been shown in this session
 var first_game_started: bool = false  # Track if this is the first game
+var hint_blink_tween: Tween = null  # Tween for blinking animation
 
 # Textures set in editor
 @export var hidden_texture: Texture  # Texture for card back (when flipped)
@@ -496,12 +497,39 @@ func _on_hint_timer_timeout():
 	if not has_shown_hint_before and hint_label:
 		hint_label.visible = true
 		has_shown_hint_before = true
+		start_hint_blink()
 
 
 func hide_hint():
 	"""Hide the hint and stop the timer"""
 	if hint_timer:
 		hint_timer.stop()
+	stop_hint_blink()
 	if hint_label:
 		hint_label.visible = false
+		hint_label.modulate.a = 1.0  # Reset opacity
 	has_shown_hint_before = true
+
+
+func start_hint_blink():
+	"""Start the blinking animation for the hint label"""
+	if not hint_label:
+		return
+	
+	# Stop any existing blink animation
+	stop_hint_blink()
+	
+	# Create a new tween for blinking
+	hint_blink_tween = create_tween()
+	hint_blink_tween.set_loops()  # Loop infinitely
+	
+	# Fade out then fade in (0.5 seconds each)
+	hint_blink_tween.tween_property(hint_label, "modulate:a", 0.0, 0.5)
+	hint_blink_tween.tween_property(hint_label, "modulate:a", 1.0, 0.5)
+
+
+func stop_hint_blink():
+	"""Stop the blinking animation"""
+	if hint_blink_tween:
+		hint_blink_tween.kill()
+		hint_blink_tween = null
