@@ -522,7 +522,7 @@ func publish_finish(final_score: int):
 	}
 	
 	var json_string = JSON.stringify(finish_data)
-	mqtt_client.publish(topic_finish, json_string, false, 0)  # QoS 0 (library has issues with QoS 1)
+	mqtt_client.publish(topic_finish, json_string, false, 1)  # QoS 1, Not retained
 	
 	print("MQTTManager: Published finish to %s: %s" % [topic_finish, json_string])
 	print("  Team: %s" % current_team_name)
@@ -587,7 +587,7 @@ func publish_changename(old_name: String, new_name: String):
 	}
 	
 	var json_string = JSON.stringify(changename_data)
-	mqtt_client.publish(topic_changename, json_string, false, 0)  # QoS 0 (library has issues with QoS 1)
+	mqtt_client.publish(topic_changename, json_string, false, 1)  # QoS 1, Not retained
 	
 	print("MQTTManager: Published changename to %s" % topic_changename)
 	print("  Old Name: %s" % old_name)

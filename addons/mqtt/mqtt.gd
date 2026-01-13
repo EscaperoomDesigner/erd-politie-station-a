@@ -451,7 +451,7 @@ func wait_msg():
 		var apid = (receivedbuffer[i]<<8) + receivedbuffer[i+1]
 		if verbose_level >= 2:
 			print("PUBACK[%d]" % apid)
-		emit_signal("publish_acknowledgewait_msg", apid)
+		emit_signal("publish_acknowledge", apid)
 
 	elif op == CP_SUBACK:
 		assert (sz == 3)

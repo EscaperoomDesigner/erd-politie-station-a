@@ -19,6 +19,7 @@ var is_game_active: bool = false
 # Timer
 var timer_running: bool = false
 var time_remaining: float = 0.0
+var mqtt_publish_timer: float = 0.0  # Timer for MQTT updates
 
 
 func _ready():
@@ -29,6 +30,13 @@ func _process(delta: float):
 	if timer_running and time_remaining > 0:
 		time_remaining -= delta
 		timer_updated.emit(time_remaining)
+		
+		# Publish timeleft to MQTT every second
+		mqtt_publish_timer += delta
+		if mqtt_publish_timer >= 1.0:
+			mqtt_publish_timer = 0.0
+			if has_node("/root/MQTTManager"):
+				get_node("/root/MQTTManager").publish_timeleft(int(time_remaining))
 		
 		if time_remaining <= 0:
 			time_remaining = 0
@@ -71,6 +79,10 @@ func add_score(points: int = 1):
 	if is_game_active:
 		score += points
 		score_changed.emit(score)
+		
+		# Publish score to MQTT
+		if has_node("/root/MQTTManager"):
+			get_node("/root/MQTTManager").publish_stationscore(score)
 		
 		# Play coin sound effect
 		if has_node("/root/SfxManager"):
