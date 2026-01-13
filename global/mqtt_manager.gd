@@ -27,6 +27,7 @@ var current_team_name: String = ""
 var is_session_active: bool = false
 var mqtt_connected: bool = false
 var station_id: String = ""  # Extracted station ID (e.g., "station-a")
+var name_suggestions: Array = []  # Name suggestions from start message
 
 # MQTT client instance (using the real library)
 var mqtt_client: Node = null
@@ -239,6 +240,13 @@ func _handle_start_message(payload: String):
 		var team_name = data.team.name if data.team.has("name") else "Unknown Team"
 		var previous_score = data.team.score if data.team.has("score") else 0
 		var time_seconds = data.time
+		
+		# Extract name suggestions if provided
+		if data.has("namesuggestions"):
+			name_suggestions = data.namesuggestions
+			print("MQTTManager: Received %d name suggestions" % name_suggestions.size())
+		else:
+			name_suggestions = []
 		
 		current_team_name = team_name
 		is_session_active = true
