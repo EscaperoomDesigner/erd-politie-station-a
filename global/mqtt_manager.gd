@@ -45,7 +45,7 @@ func _ready():
 	add_child(mqtt_client)
 	
 	# Configure client
-	mqtt_client.client_id = "godot_%s_%d" % [DEVICE_ID, randi()]
+	mqtt_client.client_id = "%s" % DEVICE_ID
 	mqtt_client.verbose_level = 2  # 0=quiet, 1=connections, 2=all messages
 	
 	# Connect signals
