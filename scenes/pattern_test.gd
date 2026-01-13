@@ -123,7 +123,7 @@ func load_next_question():
 		# Don't end game yet - continue to memory game
 		
 		# Go instantly to memory game (it's part of the game flow)
-		get_tree().change_scene_to_file("res://memory_game/memory_game.tscn")
+		get_tree().change_scene_to_file("uid://se20tbcetnc3")
 		return
 	
 	user_answers.clear()
@@ -587,7 +587,7 @@ func _on_game_time_expired():
 	SfxManager.stop_all_sounds()
 	
 	# Go directly to GO screen
-	get_tree().change_scene_to_file("res://scenes/go_screen.tscn")
+	get_tree().change_scene_to_file("uid://dkcpxxn7l8nba")
 
 
 func _build_hint_sequence():

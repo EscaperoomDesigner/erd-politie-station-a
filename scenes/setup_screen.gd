@@ -3,12 +3,13 @@ extends Control
 # Setup screen that waits for MQTT start message
 # Also includes test button to manually trigger start
 
-@onready var status_label: Label = $CenterContainer/VBoxContainer/StatusLabel
-@onready var waiting_label: Label = $CenterContainer/VBoxContainer/WaitingLabel
-@onready var test_button: Button = $CenterContainer/VBoxContainer/TestButton
-@onready var skip_button: Button = $CenterContainer/VBoxContainer/SkipButton
-@onready var connect_button: Button = $CenterContainer/VBoxContainer/ConnectButton
-@onready var connection_label: Label = $ConnectionLabel
+@onready var status_label: Label = %StatusLabel
+@onready var waiting_label: Label = %WaitingLabel
+@onready var test_button: Button = %TestButton
+@onready var skip_button: Button = %SkipButton
+@onready var connect_button: Button = %ConnectButton
+@onready var connection_label: Label = %ConnectionLabel
+
 
 var waiting_dots: int = 0
 var dot_timer: float = 0.0
@@ -54,7 +55,6 @@ func _update_waiting_text():
 
 func _update_connection_status():
 	if connection_label and MQTTManager:
-		var status = MQTTManager.get_connection_status()
 		if MQTTManager.mqtt_connected:
 			connection_label.text = "MQTT: ✓ Verbonden (%s:%d)" % [MQTTManager.BROKER_IP, MQTTManager.BROKER_PORT]
 			connection_label.add_theme_color_override("font_color", Color(0.3, 1.0, 0.3))
@@ -76,7 +76,7 @@ func _on_mqtt_start_received():
 	print("SetupScreen: Start message received! Transitioning to game...")
 	
 	# Change to game scene
-	get_tree().change_scene_to_file("res://scenes/pattern_test.tscn")
+	get_tree().change_scene_to_file("uid://bo3qkm2gv7u7v")
 
 
 func _on_test_button_pressed():
@@ -112,7 +112,7 @@ func _on_skip_button_pressed():
 	GameManager.start_game()
 	
 	# Change to game scene
-	get_tree().change_scene_to_file("res://scenes/pattern_test.tscn")
+	get_tree().change_scene_to_file("uid://bo3qkm2gv7u7v")
 
 
 func _on_connect_button_pressed():
