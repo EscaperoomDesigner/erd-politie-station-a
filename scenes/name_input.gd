@@ -65,6 +65,16 @@ func _on_timer_expired():
 
 func _on_name_selected(selected_name: String):
 	timer_active = false
+	
+	# Get old name (current player name before change)
+	var old_name = GameManager.player_name
+	
+	# Update GameManager with new name
 	GameManager.set_player_name(selected_name)
+	
+	# Publish name change to MQTT
+	if has_node("/root/MQTTManager"):
+		get_node("/root/MQTTManager").publish_changename(old_name, selected_name)
+	
 	name_confirmed.emit(selected_name)
 	queue_free()

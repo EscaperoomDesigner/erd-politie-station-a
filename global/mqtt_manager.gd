@@ -6,6 +6,8 @@ extends Node
 
 # Signals
 signal game_start_received()
+signal server_command_received(command: String)
+signal team_updated(team_data: Dictionary)
 
 # Configuration - loaded from ConfigManager
 var BROKER_IP: String = "192.168.1.2"
@@ -16,9 +18,22 @@ var DEVICE_ID: String = "station-a"
 var AUTO_CONNECT: bool = true
 
 # MQTT Topics - Dynamically constructed based on device configuration
-var topic_start: String = ""
-var topic_finish: String = ""
-var topic_timeleft: String = ""
+# Control Panel → Station (Subscribe)
+var topic_start: String = ""  # QoS 1 (spec says 2, but library doesn't support it)
+var topic_server_command: String = ""  # QoS 1 (spec says 2, but library doesn't support it)
+var topic_team: String = ""  # QoS 1, Retained (spec says 2, but library doesn't support it)
+
+# Station → Control Panel (Publish)
+var topic_finish: String = ""  # QoS 1 (spec says 2, but library doesn't support it)
+var topic_timeleft: String = ""  # QoS 0, Retained
+var topic_stationscore: String = ""  # QoS 0, Retained
+var topic_changename: String = ""  # QoS 1 (spec says 2, but library doesn't support it)
+
+# Global topics
+const TOPIC_HIGHSCORES: String = "erd/drugslab/highscores"  # Scoreboard (retained)
+const TOPIC_STATION_FINISHED: String = "erd/drugslab/station-finished/team"  # Team completion status (retained)
+
+# Legacy topics
 const TOPIC_SCORES: String = "erd/drugslab/scores"
 const TOPIC_IR_SENSOR: String = "sensor/ir/beam"  # IR break beam sensor
 
@@ -85,9 +100,15 @@ func _initialize_device_config():
 	if DEVICE_TYPE == "station":
 		# For station devices, DEVICE_ID should be station-a, station-b, etc.
 		station_id = DEVICE_ID
+		# Subscribe topics (from Control Panel)
 		topic_start = "erd/drugslab/%s/start" % station_id
+		topic_server_command = "erd/drugslab/%s/server_command" % station_id
+		topic_team = "erd/drugslab/%s/team" % station_id
+		# Publish topics (to Control Panel)
 		topic_finish = "erd/drugslab/%s/finish" % station_id
 		topic_timeleft = "erd/drugslab/%s/timeleft" % station_id
+		topic_stationscore = "erd/drugslab/%s/stationscore" % station_id
+		topic_changename = "erd/drugslab/%s/changename" % station_id
 	elif DEVICE_TYPE == "highscore":
 		# For highscore displays, extract station from device ID if applicable
 		# e.g., "highscore-station-a" -> subscribe to station-a topics
@@ -106,7 +127,10 @@ func _initialize_device_config():
 		# Highscore displays only listen, they don't need finish topic
 		if station_id != "":
 			topic_start = "erd/drugslab/%s/start" % station_id
+			topic_server_command = "erd/drugslab/%s/server_command" % station_id
+			topic_team = "erd/drugslab/%s/team" % station_id
 			topic_timeleft = "erd/drugslab/%s/timeleft" % station_id
+			topic_stationscore = "erd/drugslab/%s/stationscore" % station_id
 			topic_finish = "erd/drugslab/%s/finish" % station_id
 	else:
 		print("ERROR: Unknown DEVICE_TYPE: %s" % DEVICE_TYPE)
@@ -154,22 +178,38 @@ func _on_mqtt_connected():
 	# Subscribe based on device type
 	print("MQTTManager: Subscribing to topics...")
 	
-	# All devices subscribe to scores
+	# All devices subscribe to global topics
 	mqtt_client.subscribe(TOPIC_SCORES)
 	print("  ✓ %s" % TOPIC_SCORES)
 	
+	mqtt_client.subscribe(TOPIC_HIGHSCORES)
+	print("  ✓ %s (Retained)" % TOPIC_HIGHSCORES)
+	
+	mqtt_client.subscribe(TOPIC_STATION_FINISHED)
+	print("  ✓ %s (Retained)" % TOPIC_STATION_FINISHED)
+	
 	# Station-specific subscriptions
 	if station_id != "":
-		mqtt_client.subscribe(topic_start)
-		print("  ✓ %s" % topic_start)
+		# Subscribe to Control Panel → Station topics
+		mqtt_client.subscribe(topic_start, 1)  # QoS 1 (library doesn't support QoS 2)
+		print("  ✓ %s (QoS 1)" % topic_start)
 		
-		mqtt_client.subscribe(topic_timeleft)
-		print("  ✓ %s" % topic_timeleft)
+		mqtt_client.subscribe(topic_server_command, 1)  # QoS 1 (library doesn't support QoS 2)
+		print("  ✓ %s (QoS 1)" % topic_server_command)
+		
+		mqtt_client.subscribe(topic_team, 1)  # QoS 1, Retained (library doesn't support QoS 2)
+		print("  ✓ %s (QoS 1, Retained)" % topic_team)
+		
+		mqtt_client.subscribe(topic_timeleft)  # QoS 0
+		print("  ✓ %s (QoS 0)" % topic_timeleft)
+		
+		mqtt_client.subscribe(topic_stationscore)  # QoS 0
+		print("  ✓ %s (QoS 0)" % topic_stationscore)
 		
 		# Only station devices (not highscore displays) need finish subscription for echo/confirmation
 		if DEVICE_TYPE == "station":
-			mqtt_client.subscribe(topic_finish)
-			print("  ✓ %s (echo)" % topic_finish)
+			mqtt_client.subscribe(topic_finish, 1)  # QoS 1 (library doesn't support QoS 2)
+			print("  ✓ %s (QoS 1, echo)" % topic_finish)
 	
 	# Only station devices with sensors subscribe to IR sensor topic
 	if DEVICE_TYPE == "station":
@@ -207,12 +247,22 @@ func _on_mqtt_message_received(topic: String, payload: String):
 	# Route to appropriate handler
 	if topic == topic_start:
 		_handle_start_message(payload)
+	elif topic == topic_server_command:
+		_handle_server_command_message(payload)
+	elif topic == topic_team:
+		_handle_team_message(payload)
 	elif topic == topic_timeleft:
 		_handle_timeleft_message(payload)
+	elif topic == topic_stationscore:
+		_handle_stationscore_message(payload)
 	elif topic == topic_finish:
 		_handle_finish_message(payload)
 	elif topic == TOPIC_SCORES:
 		_handle_scores_message(payload)
+	elif topic == TOPIC_HIGHSCORES:
+		_handle_highscores_message(payload)
+	elif topic == TOPIC_STATION_FINISHED:
+		_handle_station_finished_message(payload)
 	elif topic == TOPIC_IR_SENSOR:
 		_handle_ir_sensor_message(payload)
 	else:
@@ -281,9 +331,66 @@ func _handle_timeleft_message(payload: String):
 		pass
 
 
+func _handle_server_command_message(payload: String):
+	"""Handle server command message
+	Format: "stop" or "restart" (string payload)
+	"""
+	var command = payload.strip_edges().trim_prefix('"').trim_suffix('"')  # Remove quotes if present
+	print("MQTTManager: Server command received: %s" % command)
+	
+	if command == "stop":
+		print("MQTTManager: Stop command - ending game")
+		is_session_active = false
+		GameManager.end_game()
+	elif command == "restart":
+		print("MQTTManager: Restart command - resetting game")
+		is_session_active = false
+		GameManager.reset_game()
+	else:
+		print("MQTTManager: Unknown command: %s" % command)
+	
+	server_command_received.emit(command)
+
+
+func _handle_team_message(payload: String):
+	"""Handle team update message
+	Format: {"name": "...", "scores": {"station-a": 100, "station-b": 200, ...}}
+	"""
+	var json = JSON.new()
+	var error = json.parse(payload)
+	
+	if error != OK:
+		print("MQTTManager: Failed to parse team message")
+		return
+	
+	var data = json.data
+	if data.has("name"):
+		var team_name = data.name
+		var scores = data.scores if data.has("scores") else {}
+		print("MQTTManager: Team update - Name: %s" % team_name)
+		if scores:
+			print("MQTTManager: Team scores: %s" % str(scores))
+		
+		# Update current team if game is active
+		if is_session_active:
+			current_team_name = team_name
+			GameManager.set_player_name(team_name)
+		
+		team_updated.emit(data)
+
+
+func _handle_stationscore_message(payload: String):
+	"""Handle station score update (retained)
+	Format: number as string (e.g., "850")
+	"""
+	var score = int(payload)
+	print("MQTTManager: Station score update: %d" % score)
+	# This is typically published by us, but can be used for sync if needed
+
+
 func _handle_finish_message(payload: String):
 	"""Handle finish message (echo from server or from other stations)
-	Format: {"team": "BadassTeam", "score": 120}
+	Format: {"team": "...", "stationscore": 1200}
 	"""
 	var json = JSON.new()
 	var error = json.parse(payload)
@@ -293,10 +400,10 @@ func _handle_finish_message(payload: String):
 		return
 	
 	var data = json.data
-	if data.has("team") and data.has("score"):
+	if data.has("team") and data.has("stationscore"):
 		var team_name = data.team
-		var score = data.score
-		print("MQTTManager: Team '%s' finished with score: %d" % [team_name, score])
+		var score = data.stationscore
+		print("MQTTManager: Team '%s' finished with station score: %d" % [team_name, score])
 
 
 func _handle_scores_message(payload: String):
@@ -330,6 +437,64 @@ func _handle_scores_message(payload: String):
 	# You can add a signal here if needed: emit_signal("leaderboard_updated", scores_data)
 
 
+func _handle_highscores_message(payload: String):
+	"""Handle highscores/scoreboard update from server
+	Format: Array of team objects (retained)
+	[
+		{
+			"name": "TeamName",
+			"location": "finished",
+			"scores": {"station-a": 800, "station-b": 750, ...},
+			"score": 2950
+		},
+		...
+	]
+	"""
+	var json = JSON.new()
+	var error = json.parse(payload)
+	
+	if error != OK:
+		print("MQTTManager: Failed to parse highscores message")
+		return
+	
+	var highscores_data = json.data
+	if typeof(highscores_data) != TYPE_ARRAY:
+		print("MQTTManager: Invalid highscores format (expected array)")
+		return
+	
+	print("MQTTManager: Highscores updated - %d teams" % highscores_data.size())
+	
+	# Store or emit signal for UI display
+	# You can add a signal here if needed: emit_signal("highscores_updated", highscores_data)
+
+
+func _handle_station_finished_message(payload: String):
+	"""Handle station completion status update
+	Format: Team completion status per station (retained)
+	{
+		"team-name": {
+			"station-a": true,
+			"station-b": true,
+			"station-c": false,
+			"station-d": false
+		}
+	}
+	"""
+	var json = JSON.new()
+	var error = json.parse(payload)
+	
+	if error != OK:
+		print("MQTTManager: Failed to parse station-finished message")
+		return
+	
+	var finished_data = json.data
+	print("MQTTManager: Station finished status updated")
+	print("  Data: %s" % str(finished_data))
+	
+	# Store or emit signal for UI display
+	# You can add a signal here if needed: emit_signal("station_finished_updated", finished_data)
+
+
 func _handle_ir_sensor_message(payload: String):
 	"""Handle IR break beam sensor trigger
 	Format: {"status": "triggered", "timestamp": "...", "sensor": "ir_beam"}
@@ -350,7 +515,8 @@ func _handle_ir_sensor_message(payload: String):
 
 func publish_finish(final_score: int):
 	"""Publish finish message when game completes
-	Station sends: {"team": "BadassTeam", "score": 120}
+	Station sends: {"team": "...", "stationscore": 1200}
+	QoS 1, Not retained (spec says QoS 2, but library doesn't support it)
 	Only called by station devices, not highscore displays
 	"""
 	if DEVICE_TYPE != "station":
@@ -367,17 +533,79 @@ func publish_finish(final_score: int):
 	
 	var finish_data = {
 		"team": current_team_name,
-		"score": final_score
+		"stationscore": final_score
 	}
 	
 	var json_string = JSON.stringify(finish_data)
-	mqtt_client.publish(topic_finish, json_string)
+	mqtt_client.publish(topic_finish, json_string, 1)  # QoS 1 (library doesn't support QoS 2)
 	
 	print("MQTTManager: Published finish to %s" % topic_finish)
 	print("  Team: %s" % current_team_name)
-	print("  Score: %d" % final_score)
+	print("  Station Score: %d" % final_score)
 	
 	is_session_active = false
+
+
+func publish_timeleft(seconds: int):
+	"""Publish time left update
+	Station sends: number (e.g., 180)
+	QoS 0, Retained
+	"""
+	if DEVICE_TYPE != "station":
+		print("MQTTManager: Only station devices can publish timeleft")
+		return
+	
+	if not mqtt_connected:
+		print("MQTTManager: Cannot publish - not connected to broker")
+		return
+	
+	mqtt_client.publish(topic_timeleft, str(seconds), 0, true)  # QoS 0, Retained
+
+
+func publish_stationscore(score: int):
+	"""Publish station score update
+	Station sends: number (e.g., 850)
+	QoS 0, Retained
+	"""
+	if DEVICE_TYPE != "station":
+		print("MQTTManager: Only station devices can publish stationscore")
+		return
+	
+	if not mqtt_connected:
+		print("MQTTManager: Cannot publish - not connected to broker")
+		return
+	
+	mqtt_client.publish(topic_stationscore, str(score), 0, true)  # QoS 0, Retained
+
+
+func publish_changename(old_name: String, new_name: String):
+	"""Publish name change request
+	Station sends: {"oldname": "???", "newname": "..."}
+	QoS 1, Not retained (spec says QoS 2, but library doesn't support it)
+	"""
+	if DEVICE_TYPE != "station":
+		print("MQTTManager: Only station devices can publish changename")
+		return
+	
+	if not mqtt_connected:
+		print("MQTTManager: Cannot publish - not connected to broker")
+		return
+	
+	var changename_data = {
+		"oldname": old_name,
+		"newname": new_name
+	}
+	
+	var json_string = JSON.stringify(changename_data)
+	mqtt_client.publish(topic_changename, json_string, 1)  # QoS 1 (library doesn't support QoS 2)
+	
+	print("MQTTManager: Published changename to %s" % topic_changename)
+	print("  Old Name: %s" % old_name)
+	print("  New Name: %s" % new_name)
+	
+	# Update local team name
+	current_team_name = new_name
+	GameManager.set_player_name(new_name)
 
 
 # ============================================================================
@@ -441,12 +669,25 @@ func print_status():
 	print("Connected: %s" % mqtt_connected)
 	print("Session Active: %s" % is_session_active)
 	print("Current Team: %s" % current_team_name)
-	print("\nSubscribed Topics:")
+	print("\nSubscribed Topics (Control Panel → Station):")
 	if station_id != "":
-		print("  - %s" % topic_start)
-		print("  - %s" % topic_timeleft)
+		print("  - %s (QoS 1)" % topic_start)
+		print("  - %s (QoS 1)" % topic_server_command)
+		print("  - %s (QoS 1, Retained)" % topic_team)
+		print("  - %s (QoS 0, Retained)" % topic_timeleft)
+		print("  - %s (QoS 0, Retained)" % topic_stationscore)
 		if DEVICE_TYPE == "station":
-			print("  - %s" % topic_finish)
+			print("  - %s (QoS 1)" % topic_finish)
+	print("\nPublish Topics (Station → Control Panel):")
+	if DEVICE_TYPE == "station" and station_id != "":
+		print("  - %s (QoS 1)" % topic_finish)
+		print("  - %s (QoS 0, Retained)" % topic_timeleft)
+		print("  - %s (QoS 0, Retained)" % topic_stationscore)
+		print("  - %s (QoS 1)" % topic_changename)
+	print("\nGlobal Topics:")
+	print("  - %s (Retained)" % TOPIC_HIGHSCORES)
+	print("  - %s (Retained)" % TOPIC_STATION_FINISHED)
+	print("\nLegacy Topics:")
 	print("  - %s" % TOPIC_SCORES)
 	if DEVICE_TYPE == "station":
 		print("  - %s" % TOPIC_IR_SENSOR)
