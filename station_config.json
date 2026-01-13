@@ -1,6 +1,6 @@
 {
 	"mqtt": {
-		"broker_ip": "192.168.1.75",
+		"broker_ip": "192.168.1.2",
 		"broker_port": 1883,
 		"auto_connect": true,
 		"use_websocket": false
