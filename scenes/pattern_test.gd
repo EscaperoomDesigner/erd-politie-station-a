@@ -97,7 +97,7 @@ func _on_name_confirmed(_player_name: String):
 	"""Start de test nadat naam is ingevuld"""
 	visible = true
 	GameManager.start_game()  # Start de game
-	GameManager.start_timer(ConfigManager.get_default_game_time())  # Start countdown timer
+	# Timer is already running, don't restart it
 	_setup_keyboard()
 	load_next_question()
 

@@ -11,6 +11,9 @@ var countdown_time: float = 10.0
 
 func _ready():
 	print("GoScreen: Initialized")
+	# Get go screen time from config
+	countdown_time = ConfigManager.get_go_screen_time()
+	print("GoScreen: Duration set to %d seconds" % countdown_time)
 	# Start countdown
 
 

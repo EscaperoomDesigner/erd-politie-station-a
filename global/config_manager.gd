@@ -153,6 +153,9 @@ func get_points_memory_4x4() -> int:
 func get_time_bonus_multiplier() -> int:
 	return config_data.get("game", {}).get("time_bonus_multiplier", 5)
 
+func get_go_screen_time() -> float:
+	return config_data.get("game", {}).get("go_screen_time", 10.0)
+
 func get_display_width() -> int:
 	return config_data.get("display", {}).get("width", 1080)
 

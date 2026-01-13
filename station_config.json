@@ -17,6 +17,7 @@
 	},
 	"game": {
 		"default_time": 200,
+		"go_screen_time": 10,
 		"question_timer": 30,
 		"hint_delay": 1.0,
 		"points_per_question": 100,

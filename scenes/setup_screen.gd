@@ -108,7 +108,9 @@ func _on_skip_button_pressed():
 	# Set up GameManager with default values
 	GameManager.set_player_name("Test Team")
 	GameManager.set_score(0)
-	GameManager.start_timer(ConfigManager.get_default_game_time())
+	# Only start timer if it's not already running
+	if not GameManager.timer_running:
+		GameManager.start_timer(ConfigManager.get_default_game_time())
 	GameManager.start_game()
 	
 	# Change to game scene
