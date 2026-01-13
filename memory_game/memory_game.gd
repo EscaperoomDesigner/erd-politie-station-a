@@ -8,11 +8,13 @@ const GRID_3X3_SIZE = 3  # Grid size for 3x3 mode
 const GRID_4X4_SIZE = 4  # Grid size for 4x4 mode
 const NUM_PATTERNS_3X3 = 3  # Number of different patterns in 3x3 mode
 const NUM_PATTERNS_4X4 = 4  # Number of different patterns in 4x4 mode
-const POINTS_3X3 = 100  # Points awarded for completing 3x3 grid
-const POINTS_4X4 = 200  # Points awarded for completing 4x4 grid
-const TIME_BONUS_MULTIPLIER = 5  # Multiplier for time bonus points
 const NUM_3X3_ROUNDS = 2  # Number of 3x3 rounds before switching to 4x4
 const FAILURES_BEFORE_DOWNGRADE = 3  # Number of failures in 4x4 before downgrading to 3x3
+
+# Scoring - loaded from config
+var POINTS_3X3: int = 100
+var POINTS_4X4: int = 200
+var TIME_BONUS_MULTIPLIER: int = 5
 
 @onready var grid_container = %GridContainer
 @onready var hint_label = %HintLabel
@@ -49,6 +51,12 @@ var rounded_corner_material: ShaderMaterial  # Will be set from first TextureRec
 func _ready():
 	# Build pattern textures array from exported textures
 	pattern_textures = [pattern_texture_1, pattern_texture_2, pattern_texture_3, pattern_texture_4]
+	
+	# Load scoring configuration
+	if ConfigManager:
+		POINTS_3X3 = ConfigManager.get_points_memory_3x3()
+		POINTS_4X4 = ConfigManager.get_points_memory_4x4()
+		TIME_BONUS_MULTIPLIER = ConfigManager.get_time_bonus_multiplier()
 	
 	# Setup hint timer
 	hint_timer = Timer.new()

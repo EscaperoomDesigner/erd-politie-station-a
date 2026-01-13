@@ -52,6 +52,7 @@ custom_minimum_size = Vector2(0, 10)
 layout_mode = 2
 
 [node name="NameButtons" parent="VBoxContainer" instance=ExtResource("2_buttons")]
+unique_name_in_owner = true
 layout_mode = 2
 
 [node name="Spacer3" type="Control" parent="VBoxContainer"]

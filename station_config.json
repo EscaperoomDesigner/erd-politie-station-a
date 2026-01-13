@@ -17,8 +17,11 @@
 	},
 	"game": {
 		"default_time": 200,
-		"score_per_trigger": 1,
 		"question_timer": 30,
-		"hint_delay": 10.0
+		"hint_delay": 1.0,
+		"points_per_question": 100,
+		"points_memory_3x3": 100,
+		"points_memory_4x4": 200,
+		"time_bonus_multiplier": 5
 	}
 }

@@ -551,7 +551,8 @@ func _check_answer():
 	if correct:
 		feedback_label.text = "Goed!"
 		feedback_label.add_theme_color_override("font_color", Color.GREEN)
-		GameManager.add_score(100)
+		var points = ConfigManager.get_points_per_question() if ConfigManager else 100
+		GameManager.add_score(points)
 	else:
 		feedback_label.text = "Fout!"
 		feedback_label.add_theme_color_override("font_color", Color.RED)

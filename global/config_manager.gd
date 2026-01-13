@@ -69,13 +69,12 @@ func _set_defaults():
 		},
 		"game": {
 			"default_time": 180,
-			"score_per_trigger": 1,
-			"hint_delay": 15.0
-		},
-		"ir_sensor": {
-			"enabled": true,
-			"gpio_pin": 17,
-			"mode": "mqtt"
+			"question_timer": 30.0,
+			"hint_delay": 15.0,
+			"points_per_question": 100,
+			"points_memory_3x3": 100,
+			"points_memory_4x4": 200,
+			"time_bonus_multiplier": 5
 		}
 	}
 
@@ -125,23 +124,23 @@ func get_device_id() -> String:
 func get_default_game_time() -> int:
 	return config_data.get("game", {}).get("default_time", 180)
 
-func get_score_per_trigger() -> int:
-	return config_data.get("game", {}).get("score_per_trigger", 1)
-
 func get_question_timer() -> float:
 	return config_data.get("game", {}).get("question_timer", 30.0)
 
 func get_hint_delay() -> float:
 	return config_data.get("game", {}).get("hint_delay", 15.0)
 
-func is_ir_sensor_enabled() -> bool:
-	return config_data.get("ir_sensor", {}).get("enabled", true)
+func get_points_per_question() -> int:
+	return config_data.get("game", {}).get("points_per_question", 100)
 
-func get_ir_sensor_gpio_pin() -> int:
-	return config_data.get("ir_sensor", {}).get("gpio_pin", 17)
+func get_points_memory_3x3() -> int:
+	return config_data.get("game", {}).get("points_memory_3x3", 100)
 
-func get_ir_sensor_mode() -> String:
-	return config_data.get("ir_sensor", {}).get("mode", "mqtt")
+func get_points_memory_4x4() -> int:
+	return config_data.get("game", {}).get("points_memory_4x4", 200)
+
+func get_time_bonus_multiplier() -> int:
+	return config_data.get("game", {}).get("time_bonus_multiplier", 5)
 
 func get_display_width() -> int:
 	return config_data.get("display", {}).get("width", 1080)
@@ -159,5 +158,6 @@ func print_config():
 	print("Device: %s (%s)" % [get_device_id(), get_device_type()])
 	print("Display: %dx%d (Fullscreen: %s)" % [get_display_width(), get_display_height(), is_fullscreen()])
 	print("Game Time: %ds" % get_default_game_time())
-	print("IR Sensor: %s (GPIO %d, Mode: %s)" % [is_ir_sensor_enabled(), get_ir_sensor_gpio_pin(), get_ir_sensor_mode()])
+	print("Question Timer: %ds" % get_question_timer())
+	print("Scoring: Question=%d, Memory 3x3=%d, Memory 4x4=%d, Time Bonus x%d" % [get_points_per_question(), get_points_memory_3x3(), get_points_memory_4x4(), get_time_bonus_multiplier()])
 	print("===================\n")

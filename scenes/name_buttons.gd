@@ -49,15 +49,9 @@ func _create_buttons():
 
 
 func _on_button_pressed(selected_name: String):
-	"""Emit signal when a name is selected and publish finish message"""
+	"""Emit signal when a name is selected"""
 	SfxManager.play_click()
 	name_selected.emit(selected_name)
-	
-	# Publish finish message to MQTT
-	if MQTTManager:
-		var current_score = GameManager.score if GameManager else 0
-		MQTTManager.publish_finish(current_score)
-		print("NameButtons: Published finish message with team name '%s' and score %d" % [selected_name, current_score])
 
 
 func get_random_name() -> String:
