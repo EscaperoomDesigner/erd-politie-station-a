@@ -3,8 +3,8 @@ extends Control
 # GO GO GO screen shown after game ends
 # Displays for 10 seconds then returns to setup screen
 
-@onready var go_label: Label = $CenterContainer/VBoxContainer/GoLabel
-@onready var timer_label: Label = $CenterContainer/VBoxContainer/TimerLabel
+@onready var go_label: Label = %GoLabel
+@onready var timer_label: Label = %TimerLabel
 
 var countdown_time: float = 10.0
 
@@ -38,4 +38,4 @@ func _return_to_setup():
 	QuestionManager.reset()
 	
 	# Change to setup screen
-	get_tree().change_scene_to_file("res://scenes/setup_screen.tscn")
+	get_tree().change_scene_to_file("uid://c8l3yqs7hfmxr")

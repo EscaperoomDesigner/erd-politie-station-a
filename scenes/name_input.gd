@@ -4,7 +4,7 @@ extends Control
 
 signal name_confirmed(player_name: String)
 
-@onready var name_buttons = $VBoxContainer/NameButtons
+@onready var name_buttons = %NameButtons
 @onready var timer_progress_bar = %TimerProgressBar
 
 # Timer variables
