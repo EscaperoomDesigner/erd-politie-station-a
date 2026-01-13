@@ -11,14 +11,25 @@ func _ready():
 
 func load_config() -> bool:
 	"""Load configuration from station_config.json"""
-	var config_path = "res://station_config.json"
+	var config_path = ""
 	
-	# Check if running from exported build (use user:// path)
-	if !FileAccess.file_exists(config_path):
+	# When running from exported build, check next to executable first
+	if OS.has_feature("standalone"):
+		var exe_dir = OS.get_executable_path().get_base_dir()
+		var external_config = exe_dir + "/station_config.json"
+		if FileAccess.file_exists(external_config):
+			config_path = external_config
+	
+	# Fall back to bundled resource
+	if config_path == "" and FileAccess.file_exists("res://station_config.json"):
+		config_path = "res://station_config.json"
+	
+	# Last resort: user data directory
+	if config_path == "" and FileAccess.file_exists("user://station_config.json"):
 		config_path = "user://station_config.json"
 	
-	if !FileAccess.file_exists(config_path):
-		print("ConfigManager: No config file found at %s" % config_path)
+	if config_path == "":
+		print("ConfigManager: No config file found")
 		print("ConfigManager: Using default values")
 		_set_defaults()
 		return false
