@@ -19,7 +19,7 @@
 		"default_time": 200,
 		"go_screen_time": 10,
 		"question_timer": 30,
-		"hint_delay": 1.0,
+		"hint_delay": 8.0,
 		"points_per_question": 100,
 		"points_memory_3x3": 100,
 		"points_memory_4x4": 200,
