@@ -13,7 +13,8 @@ config_version=5
 config/name="politietrailer-cognitiespel"
 run/main_scene="uid://u517pdxy31w"
 config/features=PackedStringArray("4.5", "GL Compatibility")
-config/icon="res://icon.svg"
+boot_splash/fullsize=false
+config/icon="uid://crrgi5ik2r4kh"
 
 [autoload]
 

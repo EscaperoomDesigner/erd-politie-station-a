@@ -328,10 +328,13 @@ size_flags_vertical = 4
 theme_override_font_sizes/font_size = 64
 text = "9"
 
-[node name="TimerProgressBar" type="ProgressBar" parent="MarginContainer/VBoxContainer"]
+[node name="TimerProgressBar" type="ProgressBar" parent="."]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(1920, 48)
-layout_mode = 2
+layout_mode = 0
+offset_top = 920.0
+offset_right = 1920.0
+offset_bottom = 968.0
 size_flags_horizontal = 4
 max_value = 1.0
 step = 0.001
