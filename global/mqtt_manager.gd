@@ -54,6 +54,9 @@ var mqtt_client: Node = null
 
 
 func _ready():
+	# Wait for next frame to ensure ConfigManager has loaded its config
+	await get_tree().process_frame
+	
 	# Load configuration from ConfigManager
 	_load_config_from_manager()
 	
@@ -76,6 +79,7 @@ func _ready():
 	mqtt_client.broker_connection_failed.connect(_on_mqtt_error)
 	
 	print("MQTTManager initialized")
+	print("  Broker: %s:%d" % [BROKER_IP, BROKER_PORT])
 	print("  Device Type: %s" % DEVICE_TYPE)
 	print("  Device ID: %s" % DEVICE_ID)
 	if DEVICE_TYPE == "station":

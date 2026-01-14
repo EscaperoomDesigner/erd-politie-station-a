@@ -44,6 +44,12 @@ func _process(delta: float):
 			end_game()
 
 
+func _input(event: InputEvent):
+	if event.is_action_pressed("close"):
+		print("Close input detected - quitting game")
+		get_tree().quit()
+
+
 func start_game():
 	"""Start a new game"""
 	is_game_active = true

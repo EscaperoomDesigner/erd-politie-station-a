@@ -13,23 +13,50 @@ func load_config() -> bool:
 	"""Load configuration from station_config.json"""
 	var config_path = ""
 	
-	# When running from exported build, check next to executable first
-	if OS.has_feature("standalone"):
-		var exe_dir = OS.get_executable_path().get_base_dir()
-		var external_config = exe_dir + "/station_config.json"
-		if FileAccess.file_exists(external_config):
-			config_path = external_config
+	# Priority 1: External config file next to executable (for exported builds only)
+	# Check if NOT running in editor (more reliable than checking for "standalone")
+	if not OS.has_feature("editor"):
+		var exe_path = OS.get_executable_path()
+		var exe_dir = exe_path.get_base_dir()
+		
+		print("ConfigManager: Running as exported build (not in editor)")
+		print("ConfigManager: Executable path: ", exe_path)
+		print("ConfigManager: Executable directory: ", exe_dir)
+		print("ConfigManager: Current working directory: ", OS.get_environment("PWD"))
+		
+		# Try multiple path variations for external config
+		var paths_to_try = [
+			exe_dir.path_join("station_config.json"),
+			exe_dir + "/station_config.json",
+			OS.get_environment("PWD") + "/station_config.json",
+			"./station_config.json"
+		]
+		
+		for path in paths_to_try:
+			print("ConfigManager: Checking external path: ", path)
+			var exists = FileAccess.file_exists(path)
+			print("ConfigManager:   -> exists: ", exists)
+			if exists:
+				config_path = path
+				print("ConfigManager: ✓ Found external config at: ", path)
+				break
 	
-	# Fall back to bundled resource
-	if config_path == "" and FileAccess.file_exists("res://station_config.json"):
-		config_path = "res://station_config.json"
+	# Priority 2: Bundled resource (fallback for builds, primary for editor)
+	if config_path == "":
+		if FileAccess.file_exists("res://station_config.json"):
+			config_path = "res://station_config.json"
+			print("ConfigManager: Using bundled config from res://")
+		else:
+			print("ConfigManager: No bundled config found at res://station_config.json")
 	
-	# Last resort: user data directory
-	if config_path == "" and FileAccess.file_exists("user://station_config.json"):
-		config_path = "user://station_config.json"
+	# Priority 3: User data directory (last resort)
+	if config_path == "":
+		if FileAccess.file_exists("user://station_config.json"):
+			config_path = "user://station_config.json"
+			print("ConfigManager: Using user directory config")
 	
 	if config_path == "":
-		print("ConfigManager: No config file found")
+		print("ConfigManager: ERROR - No config file found in any location!")
 		print("ConfigManager: Using default values")
 		_set_defaults()
 		return false
