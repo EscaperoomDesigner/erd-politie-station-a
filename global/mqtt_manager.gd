@@ -50,6 +50,7 @@ var reconnect_timer: float = 0.0
 var is_reconnecting: bool = false
 var connection_timeout: float = 10.0  # Timeout for connection attempts
 var connection_start_time: float = 0.0
+var last_error: bool = false  # Track if last connection attempt failed
 
 # MQTT client instance (using the real library)
 var mqtt_client: Node = null
@@ -199,6 +200,7 @@ func _on_mqtt_connected():
 	is_reconnecting = false
 	reconnect_timer = 0.0
 	connection_start_time = 0.0
+	last_error = false
 	print("MQTTManager: Connected to MQTT broker")
 	print("  Client ID: %s" % mqtt_client.client_id)
 	
@@ -248,31 +250,40 @@ func _on_mqtt_disconnected():
 	# This ensures we can start fresh reconnection attempts
 	is_reconnecting = false
 	reconnect_timer = 0.0  # Reset timer to attempt reconnection immediately
+	last_error = false  # Clean disconnect, not an error
 	print("MQTTManager: Disconnected from MQTT broker - will attempt reconnection")
 
 
 func _on_mqtt_error():
 	"""Called when there's a connection error"""
 	mqtt_connected = false
-	# Don't reset is_reconnecting immediately - let the process loop handle it
-	# This prevents race conditions during connection attempts
+	last_error = true
+	is_reconnecting = false  # Reset so a new reconnection attempt can be scheduled
 	reconnect_timer = 0.0  # Reset timer to attempt reconnection immediately
 	print("MQTTManager: Connection failed - will attempt reconnection")
 
 
 func _process(delta):
 	"""Monitor connection and handle auto-reconnection"""
-	if not auto_reconnect:
-		return
-	
-	# Monitor if we got disconnected unexpectedly
-	if mqtt_client and is_instance_valid(mqtt_client) and mqtt_connected:
-		# Check if the connection state changed to disconnected
-		if mqtt_client.brokerconnectmode == 0:  # BCM_NOCONNECTION = 0
-			print("MQTTManager: Detected unexpected disconnection")
+	# Always monitor connection state, even if auto_reconnect is disabled
+	if mqtt_client and is_instance_valid(mqtt_client):
+		# Sync our connection state with the actual client state
+		var actual_connection_mode = mqtt_client.brokerconnectmode
+		
+		# BCM_NOCONNECTION = 0, anything else means connecting or connected
+		if actual_connection_mode == 0 and mqtt_connected:
+			# We think we're connected but client says we're not
+			print("MQTTManager: Detected disconnection (state mismatch)")
 			mqtt_connected = false
 			is_reconnecting = false
 			reconnect_timer = 0.0
+		elif actual_connection_mode != 0 and not mqtt_connected and not is_reconnecting:
+			# Client is in connecting/connected state but we don't know about it
+			# This shouldn't normally happen, but let's handle it
+			print("MQTTManager: Client state sync - appears to be connecting/connected")
+	
+	if not auto_reconnect:
+		return
 	
 	# Check for connection timeout
 	if is_reconnecting and mqtt_client and is_instance_valid(mqtt_client):
@@ -316,12 +327,46 @@ func _attempt_reconnection():
 
 func get_connection_status() -> String:
 	"""Get human-readable connection status"""
+	# Double-check actual client state
+	if mqtt_client and is_instance_valid(mqtt_client):
+		if mqtt_client.brokerconnectmode == 0:
+			# Actually disconnected regardless of what we think
+			if mqtt_connected:
+				# Force update our state
+				mqtt_connected = false
+			if is_reconnecting:
+				return "Reconnecting..."
+			elif not auto_reconnect:
+				if last_error:
+					return "Connection Failed (auto-reconnect disabled)"
+				else:
+					return "Disconnected (auto-reconnect disabled)"
+			elif last_error and reconnect_timer < 1.0:
+				# Show error state briefly after failure
+				return "Connection Failed (retrying in %.1fs)" % max(0.0, reconnect_interval - reconnect_timer)
+			else:
+				return "Disconnected (will retry in %.1fs)" % max(0.0, reconnect_interval - reconnect_timer)
+		else:
+			# Client thinks it's connecting or connected
+			if mqtt_connected:
+				return "Connected (%s)" % DEVICE_ID
+			else:
+				return "Connecting..."
+	
+	# Fallback if client not available
 	if mqtt_connected:
 		return "Connected (%s)" % DEVICE_ID
 	elif is_reconnecting:
 		return "Reconnecting..."
+	elif not auto_reconnect:
+		if last_error:
+			return "Connection Failed (auto-reconnect disabled)"
+		else:
+			return "Disconnected (auto-reconnect disabled)"
+	elif last_error and reconnect_timer < 1.0:
+		return "Connection Failed (retrying in %.1fs)" % max(0.0, reconnect_interval - reconnect_timer)
 	else:
-		return "Disconnected (will retry in %.1fs)" % (reconnect_interval - reconnect_timer)
+		return "Disconnected (will retry in %.1fs)" % max(0.0, reconnect_interval - reconnect_timer)
 
 
 func set_auto_reconnect(enabled: bool):
