@@ -43,6 +43,12 @@ var mqtt_connected: bool = false
 var station_id: String = ""  # Extracted station ID (e.g., "station-a")
 var name_suggestions: Array = []  # Name suggestions from start message
 
+# Auto-reconnection settings
+var auto_reconnect: bool = true
+var reconnect_interval: float = 5.0  # Try to reconnect every 5 seconds
+var reconnect_timer: float = 0.0
+var is_reconnecting: bool = false
+
 # MQTT client instance (using the real library)
 var mqtt_client: Node = null
 
@@ -137,8 +143,13 @@ func _initialize_device_config():
 
 func connect_to_broker(custom_ip: String = "", custom_port: int = 0):
 	"""Connect to the MQTT broker"""
+	# Check if mqtt_client exists
+	if not mqtt_client or not is_instance_valid(mqtt_client):
+		print("MQTTManager: Cannot connect - mqtt_client not available")
+		return
+	
 	# Check if already connected or connecting
-	if mqtt_client and mqtt_client.brokerconnectmode != 0:  # BCM_NOCONNECTION = 0
+	if mqtt_client.brokerconnectmode != 0:  # BCM_NOCONNECTION = 0
 		print("MQTTManager: Already connecting or connected (state: %d)" % mqtt_client.brokerconnectmode)
 		# If already connected, we're done
 		if mqtt_connected:
@@ -164,6 +175,10 @@ func connect_to_broker(custom_ip: String = "", custom_port: int = 0):
 
 func disconnect_from_broker():
 	"""Disconnect from the MQTT broker"""
+	if not mqtt_client or not is_instance_valid(mqtt_client):
+		print("MQTTManager: Cannot disconnect - mqtt_client not available")
+		return
+	
 	print("MQTTManager: Disconnecting from broker")
 	mqtt_client.disconnect_from_server()
 
@@ -171,6 +186,8 @@ func disconnect_from_broker():
 func _on_mqtt_connected():
 	"""Called when successfully connected to broker"""
 	mqtt_connected = true
+	is_reconnecting = false
+	reconnect_timer = 0.0
 	print("MQTTManager: Connected to MQTT broker")
 	print("  Client ID: %s" % mqtt_client.client_id)
 	
@@ -216,26 +233,82 @@ func _on_mqtt_connected():
 func _on_mqtt_disconnected():
 	"""Called when disconnected from broker"""
 	mqtt_connected = false
-	print("MQTTManager: Disconnected from MQTT broker")
+	is_reconnecting = false
+	reconnect_timer = 0.0  # Reset timer to attempt reconnection immediately
+	print("MQTTManager: Disconnected from MQTT broker - will attempt reconnection")
 
 
 func _on_mqtt_error():
 	"""Called when there's a connection error"""
 	mqtt_connected = false
-	print("MQTTManager: Connection failed!")
+	is_reconnecting = false
+	reconnect_timer = 0.0  # Reset timer to attempt reconnection immediately
+	print("MQTTManager: Connection failed - will attempt reconnection")
+
+
+func _process(delta):
+	"""Monitor connection and handle auto-reconnection"""
+	if not auto_reconnect:
+		return
+	
+	# Monitor if we got disconnected unexpectedly
+	if mqtt_client and is_instance_valid(mqtt_client) and mqtt_connected:
+		# Check if the connection state changed to disconnected
+		if mqtt_client.brokerconnectmode == 0:  # BCM_NOCONNECTION = 0
+			print("MQTTManager: Detected unexpected disconnection")
+			mqtt_connected = false
+			is_reconnecting = false
+			reconnect_timer = 0.0
+	
+	# Check if we should attempt reconnection
+	if not mqtt_connected and not is_reconnecting:
+		reconnect_timer += delta
+		if reconnect_timer >= reconnect_interval:
+			reconnect_timer = 0.0
+			_attempt_reconnection()
+
+
+func _attempt_reconnection():
+	"""Attempt to reconnect to MQTT broker"""
+	# Check if mqtt_client is available
+	if mqtt_client == null:
+		print("MQTTManager: Cannot reconnect - mqtt_client not initialized")
+		return
+	
+	# Check if mqtt_client is valid
+	if not is_instance_valid(mqtt_client):
+		print("MQTTManager: Cannot reconnect - mqtt_client is invalid")
+		return
+	
+	# Check connection mode to avoid reconnecting if already in progress
+	if mqtt_client.brokerconnectmode != 0:  # BCM_NOCONNECTION = 0
+		# Connection attempt already in progress or connected
+		return
+	
+	is_reconnecting = true
+	print("MQTTManager: Attempting to reconnect to broker...")
+	connect_to_broker()
 
 
 func get_connection_status() -> String:
 	"""Get human-readable connection status"""
 	if mqtt_connected:
 		return "Connected (%s)" % DEVICE_ID
+	elif is_reconnecting:
+		return "Reconnecting..."
 	else:
-		return "Disconnected"
+		return "Disconnected (will retry in %.1fs)" % (reconnect_interval - reconnect_timer)
+
+
+func set_auto_reconnect(enabled: bool):
+	"""Enable or disable automatic reconnection"""
+	auto_reconnect = enabled
+	print("MQTTManager: Auto-reconnect %s" % ("enabled" if enabled else "disabled"))
 
 
 func _on_mqtt_message_received(topic: String, payload: String):
 	"""Called when a message is received"""
-	if mqtt_client.verbose_level >= 2:
+	if mqtt_client and is_instance_valid(mqtt_client) and mqtt_client.verbose_level >= 2:
 		print("MQTTManager: [%s] %s" % [topic, payload])
 	
 	# Route to appropriate handler
@@ -516,6 +589,10 @@ func publish_finish(final_score: int):
 		print("MQTTManager: Cannot publish - not connected to broker")
 		return
 	
+	if not mqtt_client or not is_instance_valid(mqtt_client):
+		print("MQTTManager: Cannot publish - mqtt_client not available")
+		return
+	
 	var finish_data = {
 		"team": current_team_name,
 		"stationscore": final_score
@@ -549,6 +626,10 @@ func publish_timeleft(seconds: int):
 		print("MQTTManager: Cannot publish - not connected to broker")
 		return
 	
+	if not mqtt_client or not is_instance_valid(mqtt_client):
+		print("MQTTManager: Cannot publish - mqtt_client not available")
+		return
+	
 	mqtt_client.publish(topic_timeleft, str(seconds), true, 0)  # QoS 0, Retained
 
 
@@ -565,6 +646,10 @@ func publish_stationscore(score: int):
 		print("MQTTManager: Cannot publish - not connected to broker")
 		return
 	
+	if not mqtt_client or not is_instance_valid(mqtt_client):
+		print("MQTTManager: Cannot publish - mqtt_client not available")
+		return
+	
 	mqtt_client.publish(topic_stationscore, str(score), true, 0)  # QoS 0, Retained
 
 
@@ -579,6 +664,10 @@ func publish_changename(old_name: String, new_name: String):
 	
 	if not mqtt_connected:
 		print("MQTTManager: Cannot publish - not connected to broker")
+		return
+	
+	if not mqtt_client or not is_instance_valid(mqtt_client):
+		print("MQTTManager: Cannot publish - mqtt_client not available")
 		return
 	
 	var changename_data = {
@@ -657,6 +746,9 @@ func print_status():
 	print("Device ID: %s" % DEVICE_ID)
 	print("Station ID: %s" % station_id)
 	print("Connected: %s" % mqtt_connected)
+	print("Auto-reconnect: %s" % auto_reconnect)
+	if not mqtt_connected and auto_reconnect:
+		print("Reconnection in: %.1fs" % (reconnect_interval - reconnect_timer))
 	print("Session Active: %s" % is_session_active)
 	print("Current Team: %s" % current_team_name)
 	print("\nSubscribed Topics (Control Panel → Station):")

@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://bo3qkm2gv7u7v"]
 
 [ext_resource type="Script" uid="uid://cg14h5dq1wnry" path="res://scenes/pattern_test.gd" id="1_xh4mn"]
-[ext_resource type="Theme" uid="uid://c21uk7nolmdu6" path="res://scenes/keyboard_button.tres" id="2_ucsc3"]
+[ext_resource type="Theme" uid="uid://c21uk7nolmdu6" path="res://assets/keyboard_button.tres" id="2_ucsc3"]
 
 [node name="PatternTest" type="Control"]
 layout_mode = 3
