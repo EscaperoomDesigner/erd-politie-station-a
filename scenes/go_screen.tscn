@@ -13,6 +13,11 @@ grow_vertical = 2
 theme = ExtResource("2_theme")
 script = ExtResource("1_go")
 
+[node name="GoTimer" type="Timer" parent="."]
+unique_name_in_owner = true
+wait_time = 10.0
+one_shot = true
+
 [node name="ColorRect" type="ColorRect" parent="."]
 layout_mode = 1
 anchors_preset = 15

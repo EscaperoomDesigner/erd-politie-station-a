@@ -6,6 +6,7 @@ extends CanvasLayer
 @onready var score_label = %ScoreLabel
 @onready var team_name_label = %TeamNameLabel
 @onready var timer_label = %TimerLabel
+@onready var timer_node: Timer = %GameTimer
 
 # Score animation variables
 var displayed_score: int = 0
@@ -19,8 +20,6 @@ func _ready():
 	GameManager.timer_updated.connect(_on_timer_updated)
 	GameManager.game_ended.connect(_on_game_ended)
 	GameManager.player_name_changed.connect(_on_player_name_changed)
-	
-
 	
 	# Initialize display
 	update_score(GameManager.score)

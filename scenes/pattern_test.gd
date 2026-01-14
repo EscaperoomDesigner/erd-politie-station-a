@@ -11,6 +11,8 @@ extends Control
 @onready var keyboard_row2 = %Row2
 @onready var keyboard_row3 = %Row3
 @onready var timer_progress_bar = %TimerProgressBar
+@onready var question_timer_node: Timer = %QuestionTimer
+@onready var hint_timer_node: Timer = %HintTimer
 
 var current_question: QuestionData
 var user_answers: Array[String] = []
@@ -21,14 +23,11 @@ var current_input: String = ""  # Voor meerdere cijfers
 var input_cooldown: bool = false  # Voorkom spam
 var is_answering: bool = false  # Of we in feedback mode zijn
 
-# Timer variables
-var question_timer: float = 30.0
-var time_remaining: float = 30.0
-var timer_active: bool = false
+# Timer configuration
+var question_timer_duration: float = 30.0
+var hint_delay: float = 15.0
 
 # Hint variables
-var hint_delay: float = 15.0
-var hint_timer: float = 0.0
 var current_hint_index: int = 0
 var hint_sequence: Array[int] = []  # Indices of filled boxes to highlight in sequence
 var hint_color_index: int = 0  # Current color index for cycling through colors
@@ -43,9 +42,20 @@ const PATTERN_BOX_SCENE = preload("uid://c7kqvp4x7ejyh")
 
 func _ready():
 	# Load timer configuration
-	question_timer = ConfigManager.get_question_timer()
+	question_timer_duration = ConfigManager.get_question_timer()
 	hint_delay = ConfigManager.get_hint_delay()
-	time_remaining = question_timer
+	
+	# Configure question timer from scene
+	if question_timer_node:
+		question_timer_node.wait_time = question_timer_duration
+		question_timer_node.one_shot = true
+		question_timer_node.timeout.connect(_on_timer_expired)
+	
+	# Configure hint timer from scene
+	if hint_timer_node:
+		hint_timer_node.wait_time = hint_delay
+		hint_timer_node.one_shot = true
+		hint_timer_node.timeout.connect(_start_hint_sequence)
 	
 	# Connect to GameManager signals
 	if GameManager:
@@ -54,35 +64,25 @@ func _ready():
 	_show_name_input()
 
 
-func _process(delta: float):
-	"""Update timer every frame"""
-	if timer_active and not is_answering:
-		time_remaining -= delta
+func _process(_delta: float):
+	"""Update timer progress bar every frame"""
+	if question_timer_node and question_timer_node.time_left > 0 and not is_answering:
+		var time_remaining = question_timer_node.time_left
 		
 		# Update progress bar (1.0 = full, 0.0 = empty)
 		if timer_progress_bar:
-			timer_progress_bar.value = time_remaining / question_timer
+			timer_progress_bar.value = time_remaining / question_timer_duration
 			
 			# Change color based on time remaining
-			if time_remaining <= question_timer * 0.25:
+			if time_remaining <= question_timer_duration * 0.25:
 				# Red when less than 25% time left
 				timer_progress_bar.modulate = Color(1.0, 0.3, 0.3)
-			elif time_remaining <= question_timer * 0.5:
+			elif time_remaining <= question_timer_duration * 0.5:
 				# Yellow when less than 50% time left
 				timer_progress_bar.modulate = Color(1.0, 1.0, 0.3)
 			else:
 				# Green when more than 50% time left
 				timer_progress_bar.modulate = Color(0.3, 1.0, 0.3)
-		
-		# Update hint timer
-		if not hint_active:
-			hint_timer += delta
-			if hint_timer >= hint_delay:
-				_start_hint_sequence()
-		
-		# Time's up!
-		if time_remaining <= 0:
-			_on_timer_expired()
 
 
 func _show_name_input():
@@ -117,7 +117,13 @@ func load_next_question():
 		feedback_label.add_theme_color_override("font_color", Color.GOLD)
 		keyboard_container.visible = false
 		hint_label.text = ""
-		timer_active = false
+		
+		# Stop timers
+		if question_timer_node:
+			question_timer_node.stop()
+		if hint_timer_node:
+			hint_timer_node.stop()
+		
 		if timer_progress_bar:
 			timer_progress_bar.visible = false
 		# Don't end game yet - continue to memory game
@@ -138,13 +144,15 @@ func load_next_question():
 	SfxManager.stop_all_sounds()
 	
 	# Reset hint system
-	hint_timer = 0.0
 	current_hint_index = 0
 	_build_hint_sequence()
 	
-	# Start timer
-	time_remaining = question_timer
-	timer_active = true
+	# Start timers
+	if question_timer_node:
+		question_timer_node.start()
+	if hint_timer_node:
+		hint_timer_node.start()
+	
 	if timer_progress_bar:
 		timer_progress_bar.value = 1.0
 		timer_progress_bar.modulate = Color(0.3, 1.0, 0.3)
@@ -539,7 +547,12 @@ func _find_next_empty_blank() -> int:
 func _check_answer():
 	"""Check of het antwoord correct is"""
 	is_answering = true  # Blokkeer input tijdens feedback
-	timer_active = false  # Stop timer
+	
+	# Stop timers
+	if question_timer_node:
+		question_timer_node.stop()
+	if hint_timer_node:
+		hint_timer_node.stop()
 	
 	var correct = true
 	
@@ -568,10 +581,12 @@ func _check_answer():
 
 func _on_timer_expired():
 	"""Called when question timer runs out - move to next question"""
-	timer_active = false
-	
 	# Stop any playing hint sounds
 	SfxManager.stop_all_sounds()
+	
+	# Stop hint timer if still running
+	if hint_timer_node:
+		hint_timer_node.stop()
 	
 	# Check if GameManager timer is still running
 	if GameManager.timer_running:

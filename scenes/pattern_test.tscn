@@ -12,6 +12,14 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_xh4mn")
 
+[node name="QuestionTimer" type="Timer" parent="."]
+unique_name_in_owner = true
+one_shot = true
+
+[node name="HintTimer" type="Timer" parent="."]
+unique_name_in_owner = true
+one_shot = true
+
 [node name="FeedbackLabel" type="Label" parent="."]
 unique_name_in_owner = true
 z_index = 100
