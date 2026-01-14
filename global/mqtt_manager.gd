@@ -48,6 +48,8 @@ var auto_reconnect: bool = true
 var reconnect_interval: float = 5.0  # Try to reconnect every 5 seconds
 var reconnect_timer: float = 0.0
 var is_reconnecting: bool = false
+var connection_timeout: float = 10.0  # Timeout for connection attempts
+var connection_start_time: float = 0.0
 
 # MQTT client instance (using the real library)
 var mqtt_client: Node = null
@@ -150,6 +152,7 @@ func connect_to_broker(custom_ip: String = "", custom_port: int = 0):
 	# Check if mqtt_client exists
 	if not mqtt_client or not is_instance_valid(mqtt_client):
 		print("MQTTManager: Cannot connect - mqtt_client not available")
+		is_reconnecting = false
 		return
 	
 	# Check if already connected or connecting
@@ -158,9 +161,11 @@ func connect_to_broker(custom_ip: String = "", custom_port: int = 0):
 		# If already connected, we're done
 		if mqtt_connected:
 			print("MQTTManager: Already connected!")
+			is_reconnecting = false
 			return
 		# If connecting, let it finish
 		print("MQTTManager: Connection attempt already in progress...")
+		# Don't reset is_reconnecting here - let it complete
 		return
 	
 	var ip = custom_ip if custom_ip != "" else BROKER_IP
@@ -174,6 +179,7 @@ func connect_to_broker(custom_ip: String = "", custom_port: int = 0):
 		broker_url = "tcp://%s:%d" % [ip, port]
 	
 	print("MQTTManager: Connecting to %s" % broker_url)
+	connection_start_time = Time.get_ticks_msec() / 1000.0
 	mqtt_client.connect_to_broker(broker_url)
 
 
@@ -192,6 +198,7 @@ func _on_mqtt_connected():
 	mqtt_connected = true
 	is_reconnecting = false
 	reconnect_timer = 0.0
+	connection_start_time = 0.0
 	print("MQTTManager: Connected to MQTT broker")
 	print("  Client ID: %s" % mqtt_client.client_id)
 	
@@ -237,6 +244,8 @@ func _on_mqtt_connected():
 func _on_mqtt_disconnected():
 	"""Called when disconnected from broker"""
 	mqtt_connected = false
+	# Reset reconnecting flag when we get a definitive disconnect
+	# This ensures we can start fresh reconnection attempts
 	is_reconnecting = false
 	reconnect_timer = 0.0  # Reset timer to attempt reconnection immediately
 	print("MQTTManager: Disconnected from MQTT broker - will attempt reconnection")
@@ -245,7 +254,8 @@ func _on_mqtt_disconnected():
 func _on_mqtt_error():
 	"""Called when there's a connection error"""
 	mqtt_connected = false
-	is_reconnecting = false
+	# Don't reset is_reconnecting immediately - let the process loop handle it
+	# This prevents race conditions during connection attempts
 	reconnect_timer = 0.0  # Reset timer to attempt reconnection immediately
 	print("MQTTManager: Connection failed - will attempt reconnection")
 
@@ -261,6 +271,16 @@ func _process(delta):
 		if mqtt_client.brokerconnectmode == 0:  # BCM_NOCONNECTION = 0
 			print("MQTTManager: Detected unexpected disconnection")
 			mqtt_connected = false
+			is_reconnecting = false
+			reconnect_timer = 0.0
+	
+	# Check for connection timeout
+	if is_reconnecting and mqtt_client and is_instance_valid(mqtt_client):
+		var current_time = Time.get_ticks_msec() / 1000.0
+		if mqtt_client.brokerconnectmode != 0 and (current_time - connection_start_time) > connection_timeout:
+			print("MQTTManager: Connection attempt timed out after %.1f seconds" % connection_timeout)
+			# Force disconnect to reset state
+			mqtt_client.disconnect_from_server()
 			is_reconnecting = false
 			reconnect_timer = 0.0
 	
