@@ -1,0 +1,11 @@
+[gd_scene load_steps=3 format=3 uid="uid://cyvr3qp5drfte"]
+
+[ext_resource type="Theme" uid="uid://c21uk7nolmdu6" path="res://assets/keyboard_button.tres" id="1_42fn0"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_k3cu1"]
+bg_color = Color(0, 0, 0, 1)
+
+[node name="NameButton" type="Button"]
+theme = ExtResource("1_42fn0")
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_k3cu1")

@@ -4,6 +4,9 @@ extends VBoxContainer
 
 signal name_selected(selected_name: String)
 
+# Preload the button scene
+const NameButtonScene = preload("res://scenes/name_button.tscn")
+
 # Button appearance settings - easily adjustable
 @export var button_min_width: float = 0.0
 @export var button_min_height: float = 60.0
@@ -38,12 +41,13 @@ func _create_buttons():
 	for child in get_children():
 		child.queue_free()
 	
-	# Create new buttons
+	# Create new buttons from scene
 	for name in generated_names:
-		var button = Button.new()
+		var button = NameButtonScene.instantiate()
 		button.text = name
 		button.custom_minimum_size = Vector2(button_min_width, button_min_height)
 		button.add_theme_font_size_override("font_size", button_font_size)
+		button.focus_mode = Control.FOCUS_NONE  # Disable focus
 		button.pressed.connect(_on_button_pressed.bind(name))
 		add_child(button)
 
