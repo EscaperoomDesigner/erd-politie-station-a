@@ -486,9 +486,13 @@ func _handle_start_message(payload: String):
 		
 		# Update GameManager
 		GameManager.set_player_name(team_name)
-		GameManager.set_score(previous_score)
-		GameManager.start_timer(time_seconds)
+		GameManager.set_score(previous_score)  # Set total score (includes other stations)
+		GameManager.station_score = 0  # Reset this station's score to 0
+		GameManager.start_timer(time_seconds)  # This will now publish timeleft immediately
 		GameManager.start_game()
+		
+		# Publish initial station score to MQTT (clear retained value for new team)
+		publish_stationscore(0)
 		
 		print("MQTTManager: Game started for team '%s' with %d seconds" % [team_name, time_seconds])
 		

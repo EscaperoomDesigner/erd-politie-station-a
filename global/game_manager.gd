@@ -118,7 +118,12 @@ func start_timer(duration: float):
 	"""Start a countdown timer"""
 	time_remaining = duration
 	timer_running = true
+	mqtt_publish_timer = 0.0  # Reset to publish immediately
 	timer_updated.emit(time_remaining)
+	
+	# Immediately publish initial time to MQTT
+	if has_node("/root/MQTTManager"):
+		get_node("/root/MQTTManager").publish_timeleft(int(time_remaining))
 
 
 func stop_timer():
