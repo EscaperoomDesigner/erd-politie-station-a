@@ -164,10 +164,16 @@ func connect_to_broker(custom_ip: String = "", custom_port: int = 0):
 			print("MQTTManager: Already connected!")
 			is_reconnecting = false
 			return
-		# If connecting, let it finish
-		print("MQTTManager: Connection attempt already in progress...")
-		# Don't reset is_reconnecting here - let it complete
-		return
+		# If connecting but we're not aware of it, force disconnect and reconnect cleanly
+		if not is_reconnecting:
+			print("MQTTManager: State mismatch - forcing clean reconnection...")
+			mqtt_client.disconnect_from_server()
+			await get_tree().create_timer(0.5).timeout  # Wait for disconnect
+			# After disconnect, fall through to reconnect
+		else:
+			# Connection attempt already in progress
+			print("MQTTManager: Connection attempt already in progress...")
+			return
 	
 	var ip = custom_ip if custom_ip != "" else BROKER_IP
 	var port = custom_port if custom_port != 0 else BROKER_PORT
@@ -180,6 +186,7 @@ func connect_to_broker(custom_ip: String = "", custom_port: int = 0):
 		broker_url = "tcp://%s:%d" % [ip, port]
 	
 	print("MQTTManager: Connecting to %s" % broker_url)
+	is_reconnecting = true
 	connection_start_time = Time.get_ticks_msec() / 1000.0
 	mqtt_client.connect_to_broker(broker_url)
 
@@ -246,8 +253,6 @@ func _on_mqtt_connected():
 func _on_mqtt_disconnected():
 	"""Called when disconnected from broker"""
 	mqtt_connected = false
-	# Reset reconnecting flag when we get a definitive disconnect
-	# This ensures we can start fresh reconnection attempts
 	is_reconnecting = false
 	reconnect_timer = 0.0  # Reset timer to attempt reconnection immediately
 	last_error = false  # Clean disconnect, not an error
@@ -258,7 +263,7 @@ func _on_mqtt_error():
 	"""Called when there's a connection error"""
 	mqtt_connected = false
 	last_error = true
-	is_reconnecting = false  # Reset so a new reconnection attempt can be scheduled
+	is_reconnecting = false  # Reset to allow new reconnection attempts
 	reconnect_timer = 0.0  # Reset timer to attempt reconnection immediately
 	print("MQTTManager: Connection failed - will attempt reconnection")
 
@@ -270,10 +275,11 @@ func _process(delta):
 		# Sync our connection state with the actual client state
 		var actual_connection_mode = mqtt_client.brokerconnectmode
 		
-		# BCM_NOCONNECTION = 0, anything else means connecting or connected
-		if actual_connection_mode == 0 and mqtt_connected:
+		# BCM_NOCONNECTION = 0, BCM_FAILED_CONNECTION = 5
+		# Detect if client is in disconnected or failed state
+		if (actual_connection_mode == 0 or actual_connection_mode == 5) and mqtt_connected:
 			# We think we're connected but client says we're not
-			print("MQTTManager: Detected disconnection (state mismatch)")
+			print("MQTTManager: Detected disconnection (state mismatch - mode: %d)" % actual_connection_mode)
 			mqtt_connected = false
 			is_reconnecting = false
 			reconnect_timer = 0.0
@@ -281,6 +287,16 @@ func _process(delta):
 			# Client is in connecting/connected state but we don't know about it
 			# This shouldn't normally happen, but let's handle it
 			print("MQTTManager: Client state sync - appears to be connecting/connected")
+		
+		# Additional check: Verify socket health when we think we're connected
+		if mqtt_connected and actual_connection_mode == 20:  # BCM_CONNECTED = 20
+			var socket_ok = _check_socket_health()
+			if not socket_ok:
+				print("MQTTManager: Socket health check failed - forcing disconnect")
+				mqtt_client.disconnect_from_server()
+				mqtt_connected = false
+				is_reconnecting = false
+				reconnect_timer = 0.0
 	
 	if not auto_reconnect:
 		return
@@ -293,6 +309,7 @@ func _process(delta):
 			# Force disconnect to reset state
 			mqtt_client.disconnect_from_server()
 			is_reconnecting = false
+			mqtt_connected = false
 			reconnect_timer = 0.0
 	
 	# Check if we should attempt reconnection
@@ -323,6 +340,38 @@ func _attempt_reconnection():
 	is_reconnecting = true
 	print("MQTTManager: Attempting to reconnect to broker...")
 	connect_to_broker()
+
+
+func _check_socket_health() -> bool:
+	"""Check if the underlying socket connection is still healthy"""
+	if not mqtt_client or not is_instance_valid(mqtt_client):
+		return false
+	
+	# Check TCP socket status
+	if mqtt_client.socket and is_instance_valid(mqtt_client.socket):
+		var socket_status = mqtt_client.socket.get_status()
+		# STATUS_NONE = 0, STATUS_CONNECTING = 1, STATUS_CONNECTED = 2, STATUS_ERROR = 3
+		if socket_status != 2:  # Not STATUS_CONNECTED
+			print("MQTTManager: Socket not connected (status: %d)" % socket_status)
+			return false
+	
+	# Check SSL socket status if using SSL
+	if mqtt_client.sslsocket and is_instance_valid(mqtt_client.sslsocket):
+		var ssl_status = mqtt_client.sslsocket.get_status()
+		# STATUS_DISCONNECTED = 0, STATUS_HANDSHAKING = 1, STATUS_CONNECTED = 2, STATUS_ERROR = 3
+		if ssl_status != 2:  # Not STATUS_CONNECTED
+			print("MQTTManager: SSL socket not connected (status: %d)" % ssl_status)
+			return false
+	
+	# Check WebSocket status if using WebSocket
+	if mqtt_client.websocket and is_instance_valid(mqtt_client.websocket):
+		var ws_state = mqtt_client.websocket.get_ready_state()
+		# STATE_CONNECTING = 0, STATE_OPEN = 1, STATE_CLOSING = 2, STATE_CLOSED = 3
+		if ws_state != 1:  # Not STATE_OPEN
+			print("MQTTManager: WebSocket not open (state: %d)" % ws_state)
+			return false
+	
+	return true
 
 
 func get_connection_status() -> String:
