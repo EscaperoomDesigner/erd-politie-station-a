@@ -67,11 +67,10 @@ func _on_mqtt_start_received():
 	if MQTTManager and MQTTManager.game_start_received.is_connected(_on_mqtt_start_received):
 		MQTTManager.game_start_received.disconnect(_on_mqtt_start_received)
 	
-	# Reset game manager
-	GameManager.reset_game()
-	
 	# Reset questions so they can be used again and randomized
 	QuestionManager.reset()
 	
-	# Change to game scene immediately
+	# Note: Don't reset GameManager here - MQTT manager already configured it with the start data!
+	# The MQTT handler already called start_game(), set_player_name(), set_score(), and start_timer()
+	# Change to game scene immediately with the data already configured
 	get_tree().change_scene_to_file("uid://bo3qkm2gv7u7v")
