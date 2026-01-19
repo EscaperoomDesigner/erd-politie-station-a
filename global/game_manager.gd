@@ -11,7 +11,8 @@ signal game_ended()
 signal player_name_changed(new_name: String)
 
 # Game state
-var score: int = 0
+var score: int = 0  # Total score (includes other stations)
+var station_score: int = 0  # This station's score only
 var player_name: String = "PLAYER"
 var game_time: float = 0.0
 var is_game_active: bool = false
@@ -62,16 +63,17 @@ func end_game():
 	is_game_active = false
 	timer_running = false
 	game_ended.emit()
-	print("Game ended - Final score: ", score)
+	print("Game ended - Final score: ", score, " (Station score: ", station_score, ")")
 	
-	# Publish finish to MQTT if MQTTManager exists
+	# Publish finish to MQTT with station's own score (not the total)
 	if has_node("/root/MQTTManager"):
-		get_node("/root/MQTTManager").publish_finish(score)
+		get_node("/root/MQTTManager").publish_finish(station_score)
 
 
 func reset_game():
 	"""Reset all game state"""
 	score = 0
+	station_score = 0
 	time_remaining = 0.0
 	timer_running = false
 	is_game_active = false
@@ -84,17 +86,18 @@ func add_score(points: int = 1):
 	"""Add points to the score"""
 	if is_game_active:
 		score += points
+		station_score += points
 		score_changed.emit(score)
 		
-		# Publish score to MQTT
+		# Publish station's own score to MQTT (not the total)
 		if has_node("/root/MQTTManager"):
-			get_node("/root/MQTTManager").publish_stationscore(score)
+			get_node("/root/MQTTManager").publish_stationscore(station_score)
 		
 		# Play coin sound effect
 		if has_node("/root/SfxManager"):
 			get_node("/root/SfxManager").play_coin_sound()
 		
-		print("Score added: +%d (Total: %d)" % [points, score])
+		print("Score added: +%d (Total: %d, Station: %d)" % [points, score, station_score])
 	else:
 		print("Cannot add score - game not active")
 
