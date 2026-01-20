@@ -76,7 +76,7 @@ func update_score(score: int):
 
 func update_player_name(player_name: String):
 	"""Update the player name display"""
-	team_name_label.text = player_name.to_upper()
+	team_name_label.text = player_name
 
 
 func update_timer(time_seconds: float):
