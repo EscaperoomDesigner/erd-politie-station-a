@@ -20,13 +20,15 @@ func _ready():
 	# Connect to MQTTManager signals
 	if MQTTManager:
 		MQTTManager.game_start_received.connect(_on_mqtt_start_received)
-		_update_connection_status()
 	else:
 		print("SetupScreen: ERROR - MQTTManager not found!")
 	
 	# Connect spinner drawer's draw function
 	if spinner_drawer:
 		spinner_drawer.draw.connect(_draw_spinner)
+	
+	# Force initial update
+	_update_connection_status()
 
 
 func _process(delta: float):
@@ -45,19 +47,23 @@ func _process(delta: float):
 
 
 func _update_connection_status():
-	if status_label and MQTTManager:
-		if MQTTManager.mqtt_connected:
+	if not MQTTManager:
+		return
+	
+	var is_connected = MQTTManager.mqtt_connected
+	
+	if status_label:
+		if is_connected:
 			status_label.text = "Station A - Verbonden"
-			status_label.add_theme_color_override("font_color", Color.WHITE)
 		else:
 			status_label.text = "Station A - Verbroken"
-			status_label.add_theme_color_override("font_color", Color.WHITE)
+		status_label.modulate = Color.WHITE
 	
-	if waiting_label and MQTTManager:
-		if MQTTManager.mqtt_connected:
+	if waiting_label:
+		if is_connected:
 			waiting_label.text = "wachten op start signaal..."
 			waiting_label.visible = true
-			waiting_label.add_theme_color_override("font_color", Color.WHITE)
+			waiting_label.modulate = Color.WHITE
 		else:
 			waiting_label.visible = false
 

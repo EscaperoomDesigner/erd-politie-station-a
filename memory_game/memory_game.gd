@@ -49,6 +49,10 @@ var rounded_corner_material: ShaderMaterial  # Will be set from first TextureRec
 
 
 func _ready():
+	# Show the topbar when game loads
+	if has_node("/root/Overlay"):
+		get_node("/root/Overlay").set_topbar_visible(true)
+	
 	# Build pattern textures array from exported textures
 	pattern_textures = [pattern_texture_1, pattern_texture_2, pattern_texture_3, pattern_texture_4]
 	

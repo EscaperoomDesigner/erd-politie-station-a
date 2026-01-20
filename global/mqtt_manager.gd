@@ -73,7 +73,7 @@ func _ready():
 	
 	# Configure client
 	mqtt_client.client_id = "%s" % DEVICE_ID
-	mqtt_client.verbose_level = 2  # 0=quiet, 1=connections, 2=all messages
+	mqtt_client.verbose_level = 1  # 0=quiet, 1=connections only, 2=all messages (reduced to avoid socket error spam)
 	
 	# Connect signals
 	mqtt_client.broker_connected.connect(_on_mqtt_connected)
