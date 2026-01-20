@@ -73,7 +73,7 @@ func _ready():
 	
 	# Configure client
 	mqtt_client.client_id = "%s" % DEVICE_ID
-	mqtt_client.verbose_level = 1  # 0=quiet, 1=connections only, 2=all messages (reduced to avoid socket error spam)
+	mqtt_client.verbose_level = 0  # 0=quiet (suppress "bad senddata packet" errors from broken sockets)
 	
 	# Connect signals
 	mqtt_client.broker_connected.connect(_on_mqtt_connected)
@@ -277,7 +277,7 @@ func _process(delta):
 		# Sync our connection state with the actual client state
 		var actual_connection_mode = mqtt_client.brokerconnectmode
 		
-		# BCM_NOCONNECTION = 0, BCM_FAILED_CONNECTION = 5
+		# BCM_NOCONNECTION = 0, BCM_FAILED_CONNECTION = 5, BCM_CONNECTED = 20
 		# Detect if client is in disconnected or failed state
 		if (actual_connection_mode == 0 or actual_connection_mode == 5) and mqtt_connected:
 			# We think we're connected but client says we're not
@@ -291,6 +291,14 @@ func _process(delta):
 			print("MQTTManager: Reconnection failed immediately (mode: %d) - will retry" % actual_connection_mode)
 			is_reconnecting = false
 			reconnect_timer = 0.0
+		elif actual_connection_mode == 20 and mqtt_connected:
+			# Client thinks it's connected - verify socket is actually healthy
+			if not _is_socket_healthy():
+				print("MQTTManager: Socket broken despite connected state - forcing reconnect")
+				mqtt_client.disconnect_from_server()
+				mqtt_connected = false
+				is_reconnecting = false
+				reconnect_timer = 0.0
 		elif actual_connection_mode != 0 and not mqtt_connected and not is_reconnecting:
 			# Client is in connecting/connected state but we don't know about it
 			# This shouldn't normally happen, but let's handle it
@@ -346,6 +354,35 @@ func _attempt_reconnection():
 	is_reconnecting = true
 	print("MQTTManager: Attempting to reconnect to broker...")
 	connect_to_broker()
+
+
+func _is_socket_healthy() -> bool:
+	"""Quietly check if the underlying socket connection is still healthy"""
+	if not mqtt_client or not is_instance_valid(mqtt_client):
+		return false
+	
+	# Check TCP socket status
+	if mqtt_client.socket and is_instance_valid(mqtt_client.socket):
+		var socket_status = mqtt_client.socket.get_status()
+		# STATUS_NONE = 0, STATUS_CONNECTING = 1, STATUS_CONNECTED = 2, STATUS_ERROR = 3
+		if socket_status != 2:  # Not STATUS_CONNECTED
+			return false
+	
+	# Check SSL socket status if using SSL
+	if mqtt_client.sslsocket and is_instance_valid(mqtt_client.sslsocket):
+		var ssl_status = mqtt_client.sslsocket.get_status()
+		# STATUS_DISCONNECTED = 0, STATUS_HANDSHAKING = 1, STATUS_CONNECTED = 2, STATUS_ERROR = 3, STATUS_ERROR_HOSTNAME_MISMATCH = 4
+		if ssl_status != 2:  # Not STATUS_CONNECTED
+			return false
+	
+	# Check WebSocket status if using WebSocket
+	if mqtt_client.websocket and is_instance_valid(mqtt_client.websocket):
+		var ws_state = mqtt_client.websocket.get_ready_state()
+		# STATE_CONNECTING = 0, STATE_OPEN = 1, STATE_CLOSING = 2, STATE_CLOSED = 3
+		if ws_state != 1:  # Not STATE_OPEN
+			return false
+	
+	return true
 
 
 func _check_socket_health() -> bool:
@@ -532,13 +569,24 @@ func _handle_server_command_message(payload: String):
 	print("MQTTManager: Server command received: %s" % command)
 	
 	if command == "stop":
-		print("MQTTManager: Stop command - ending game")
+		print("MQTTManager: Stop command - ending game and returning to setup")
 		is_session_active = false
 		GameManager.end_game()
+		# Publish 0 to clear retained values
+		publish_timeleft(0)
+		publish_stationscore(0)
+		# Return to setup screen
+		get_tree().change_scene_to_file("res://scenes/setup_screen.tscn")
+		
 	elif command == "restart":
-		print("MQTTManager: Restart command - resetting game")
+		print("MQTTManager: Restart command - resetting game and returning to setup")
 		is_session_active = false
 		GameManager.reset_game()
+		# Publish 0 to clear retained values
+		publish_timeleft(0)
+		publish_stationscore(0)
+		# Return to setup screen
+		get_tree().change_scene_to_file("res://scenes/setup_screen.tscn")
 	else:
 		print("MQTTManager: Unknown command: %s" % command)
 	

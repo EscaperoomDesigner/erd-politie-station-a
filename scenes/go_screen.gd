@@ -1,11 +1,10 @@
 extends Control
 
 # GO GO GO screen shown after game ends (matching Station-B finish state)
-# Displays team name, timer (00:00), and score in topbar
+# Displays team name and score in topbar
 # Auto-returns to setup screen after 60 seconds if no new game starts
 
 @onready var go_label: Label = %GoLabel
-@onready var timer_label: Label = %TimerLabel
 @onready var go_timer: Timer = %GoTimer
 
 var elapsed_time: float = 0.0
@@ -33,10 +32,6 @@ func _ready():
 		print("GoScreen: Connected to MQTT start signal")
 	else:
 		print("GoScreen: ERROR - MQTTManager not found!")
-	
-	# Update timer display to show 00:00
-	if timer_label:
-		timer_label.text = "00:00"
 
 
 func _process(delta: float):

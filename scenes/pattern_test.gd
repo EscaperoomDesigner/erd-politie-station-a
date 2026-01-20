@@ -41,6 +41,10 @@ const NAME_INPUT_SCENE = preload("uid://c8k5xm6yl7wvh")
 const PATTERN_BOX_SCENE = preload("uid://c7kqvp4x7ejyh")
 
 func _ready():
+	# Show the topbar when game loads
+	if has_node("/root/Overlay"):
+		get_node("/root/Overlay").set_topbar_visible(true)
+	
 	# Load timer configuration
 	question_timer_duration = ConfigManager.get_question_timer()
 	hint_delay = ConfigManager.get_hint_delay()
