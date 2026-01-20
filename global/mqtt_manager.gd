@@ -45,7 +45,7 @@ var name_suggestions: Array = []  # Name suggestions from start message
 
 # Auto-reconnection settings
 var auto_reconnect: bool = true
-var reconnect_interval: float = 10.0  # Try to reconnect every 10 seconds
+var reconnect_interval: float = 5.0  # Try to reconnect every 5 seconds (matching station-b)
 var reconnect_timer: float = 0.0
 var is_reconnecting: bool = false
 var connection_timeout: float = 10.0  # Timeout for connection attempts
@@ -164,17 +164,17 @@ func connect_to_broker(custom_ip: String = "", custom_port: int = 0):
 			print("MQTTManager: Already connected!")
 			is_reconnecting = false
 			return
-		# If connecting but we're not aware of it, force disconnect and reconnect cleanly
-		if not is_reconnecting:
-			print("MQTTManager: State mismatch - forcing clean reconnection...")
-			mqtt_client.disconnect_from_server()
-			# Don't await here - let the disconnect happen asynchronously
-			# The next reconnection attempt will handle it
-			is_reconnecting = false
-			return
-		else:
+		# If connecting but we're not aware of it, wait for it to complete
+		if is_reconnecting:
 			# Connection attempt already in progress
 			print("MQTTManager: Connection attempt already in progress...")
+			return
+		else:
+			# State mismatch - client is connecting but we didn't initiate it
+			# Force disconnect and let the auto-reconnect logic handle it
+			print("MQTTManager: State mismatch - forcing disconnect for clean state...")
+			mqtt_client.disconnect_from_server()
+			# Don't set is_reconnecting = false here, let the disconnect callback handle it
 			return
 	
 	var ip = custom_ip if custom_ip != "" else BROKER_IP
