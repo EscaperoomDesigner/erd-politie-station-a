@@ -1,22 +1,21 @@
 extends Control
 
-# Setup screen that waits for MQTT start message
-# Also includes test button to manually trigger start
+# Setup screen that waits for MQTT start message (matching Station-B waiting state)
 
 @onready var status_label: Label = %StatusLabel
 @onready var waiting_label: Label = %WaitingLabel
-@onready var test_button: Button = %TestButton
-@onready var skip_button: Button = %SkipButton
-@onready var connect_button: Button = %ConnectButton
-@onready var connection_label: Label = %ConnectionLabel
+@onready var spinner_drawer: Control = %SpinnerDrawer
 
-
-var waiting_dots: int = 0
-var dot_timer: float = 0.0
+# Spinner animation
+var loading_angle: float = 0.0
 
 
 func _ready():
 	print("SetupScreen: Initialized")
+	
+	# Hide the overlay topbar on the setup screen
+	if has_node("/root/Overlay"):
+		get_node("/root/Overlay").set_topbar_visible(false)
 	
 	# Connect to MQTTManager signals
 	if MQTTManager:
@@ -25,50 +24,69 @@ func _ready():
 	else:
 		print("SetupScreen: ERROR - MQTTManager not found!")
 	
-	# Connect buttons
-	if test_button:
-		test_button.pressed.connect(_on_test_button_pressed)
-	if skip_button:
-		skip_button.pressed.connect(_on_skip_button_pressed)
-	if connect_button:
-		connect_button.pressed.connect(_on_connect_button_pressed)
+	# Connect spinner drawer's draw function
+	if spinner_drawer:
+		spinner_drawer.draw.connect(_draw_spinner)
 
 
 func _process(delta: float):
-	# Animate waiting dots
-	dot_timer += delta
-	if dot_timer >= 0.5:
-		dot_timer = 0.0
-		waiting_dots = (waiting_dots + 1) % 4
-		_update_waiting_text()
+	# Update loading spinner rotation (180 degrees per second)
+	loading_angle += 180.0 * delta
+	if loading_angle >= 360.0:
+		loading_angle -= 360.0
 	
 	# Update connection status
 	if MQTTManager:
 		_update_connection_status()
-
-
-func _update_waiting_text():
-	if waiting_label:
-		var dots = ".".repeat(waiting_dots)
-		waiting_label.text = "Wachten op start signaal" + dots
+	
+	# Trigger redraw for spinner animation
+	if spinner_drawer:
+		spinner_drawer.queue_redraw()
 
 
 func _update_connection_status():
-	if connection_label and MQTTManager:
+	if status_label and MQTTManager:
 		if MQTTManager.mqtt_connected:
-			connection_label.text = "MQTT: ✓ Verbonden (%s:%d)" % [MQTTManager.BROKER_IP, MQTTManager.BROKER_PORT]
-			connection_label.add_theme_color_override("font_color", Color(0.3, 1.0, 0.3))
+			status_label.text = "Station A - Verbonden"
+			status_label.add_theme_color_override("font_color", Color.WHITE)
 		else:
-			connection_label.text = "MQTT: ✗ Niet verbonden (probeer: %s:%d)" % [MQTTManager.BROKER_IP, MQTTManager.BROKER_PORT]
-			connection_label.add_theme_color_override("font_color", Color(1.0, 0.4, 0.4))
+			status_label.text = "Station A - Verbroken"
+			status_label.add_theme_color_override("font_color", Color.WHITE)
+	
+	if waiting_label and MQTTManager:
+		if MQTTManager.mqtt_connected:
+			waiting_label.text = "wachten op start signaal..."
+			waiting_label.visible = true
+			waiting_label.add_theme_color_override("font_color", Color.WHITE)
+		else:
+			waiting_label.visible = false
+
+
+func _draw_spinner():
+	"""Draw the loading spinner (only when connected)"""
+	if MQTTManager and MQTTManager.mqtt_connected and waiting_label and waiting_label.visible:
+		# Get center position below waiting text
+		var center_x = spinner_drawer.size.x / 2
+		var center_y = spinner_drawer.size.y / 2 + 120
 		
-		# Enable test button only when connected
-		if test_button:
-			test_button.disabled = not MQTTManager.mqtt_connected
+		# Spinner properties (matching Station-B)
+		var radius = 40
+		var thickness = 6
+		var num_segments = 30
 		
-		# Show/hide connect button based on connection
-		if connect_button:
-			connect_button.visible = not MQTTManager.mqtt_connected
+		var start_angle_rad = deg_to_rad(loading_angle)
+		var end_angle_rad = deg_to_rad(loading_angle + 270)
+		
+		var points: PackedVector2Array = []
+		for i in range(num_segments + 1):
+			var t = float(i) / float(num_segments)
+			var angle = start_angle_rad + (end_angle_rad - start_angle_rad) * t
+			var x = center_x + radius * cos(angle)
+			var y = center_y + radius * sin(angle)
+			points.append(Vector2(x, y))
+		
+		if points.size() > 1:
+			spinner_drawer.draw_polyline(points, Color.WHITE, thickness)
 
 
 func _on_mqtt_start_received():
@@ -77,52 +95,3 @@ func _on_mqtt_start_received():
 	
 	# Change to game scene
 	get_tree().change_scene_to_file("uid://bo3qkm2gv7u7v")
-
-
-func _on_test_button_pressed():
-	"""Test button to manually send MQTT start message"""
-	print("SetupScreen: Test button pressed - sending start message")
-	
-	if MQTTManager and MQTTManager.mqtt_connected:
-		# Send a test start message
-		var test_payload = {
-			"team": {
-				"name": "Test Team",
-				"score": 0
-			},
-			"time": ConfigManager.get_default_game_time()
-		}
-		var json_payload = JSON.stringify(test_payload)
-		
-		# Publish to the start topic
-		MQTTManager.mqtt_client.publish(MQTTManager.topic_start, json_payload)
-		print("SetupScreen: Test start message sent")
-	else:
-		print("SetupScreen: Cannot send test message - not connected to MQTT")
-
-
-func _on_skip_button_pressed():
-	"""Skip button to directly start the game without MQTT"""
-	print("SetupScreen: Skip button pressed - starting game directly")
-	
-	# Set up GameManager with default values
-	GameManager.set_player_name("Test Team")
-	GameManager.set_score(0)
-	# Only start timer if it's not already running
-	if not GameManager.timer_running:
-		GameManager.start_timer(ConfigManager.get_default_game_time())
-	GameManager.start_game()
-	
-	# Change to game scene
-	get_tree().change_scene_to_file("uid://bo3qkm2gv7u7v")
-
-
-func _on_connect_button_pressed():
-	"""Connect button to manually trigger MQTT connection"""
-	print("SetupScreen: Connect button pressed - attempting MQTT connection")
-	
-	if MQTTManager:
-		MQTTManager.connect_to_broker()
-		connection_label.text = "MQTT: Verbinding maken..."
-	else:
-		print("SetupScreen: ERROR - MQTTManager not found!")

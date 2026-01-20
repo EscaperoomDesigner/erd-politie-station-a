@@ -1,7 +1,12 @@
-[gd_scene load_steps=3 format=3 uid="uid://c8l3yqs7hfmxr"]
+[gd_scene load_steps=4 format=3 uid="uid://c8l3yqs7hfmxr"]
 
 [ext_resource type="Script" uid="uid://dux8xs3t02d8e" path="res://scenes/setup_screen.gd" id="1_setup"]
 [ext_resource type="Theme" uid="uid://jdnk88f80sos" path="res://assets/politie_theme.tres" id="2_theme"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_topbar"]
+bg_color = Color(0.2, 0.2, 0.2, 0.8235294)
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
 
 [node name="SetupScreen" type="Control"]
 layout_mode = 3
@@ -20,81 +25,63 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.1, 0.1, 0.15, 1)
+color = Color(0.101961, 0.160784, 0.396078, 1)
 
-[node name="CenterContainer" type="CenterContainer" parent="."]
+[node name="TopBar" type="Panel" parent="."]
+custom_minimum_size = Vector2(1920, 96)
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 96.0
+grow_horizontal = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_topbar")
+
+[node name="StatusLabel" type="Label" parent="TopBar"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -400.0
+offset_top = -21.0
+offset_right = 400.0
+offset_bottom = 21.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 42
+text = "Station A - Verbonden"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="WaitingLabel" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -600.0
+offset_top = -60.0
+offset_right = 600.0
+offset_bottom = 60.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 72
+text = "wachten op start signaal..."
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SpinnerDrawer" type="Control" parent="."]
+unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-
-[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer"]
-layout_mode = 2
-theme_override_constants/separation = 40
-
-[node name="StatusLabel" type="Label" parent="CenterContainer/VBoxContainer"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 48
-text = "POLITIE COGNITIE SPEL"
-horizontal_alignment = 1
-
-[node name="StationLabel" type="Label" parent="CenterContainer/VBoxContainer"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 48
-text = "station-a"
-horizontal_alignment = 1
-
-[node name="WaitingLabel" type="Label" parent="CenterContainer/VBoxContainer"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 32
-text = "Wachten op start signaal..."
-horizontal_alignment = 1
-
-[node name="Spacer" type="Control" parent="CenterContainer/VBoxContainer"]
-custom_minimum_size = Vector2(0, 20)
-layout_mode = 2
-
-[node name="TestButton" type="Button" parent="CenterContainer/VBoxContainer"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(400, 80)
-layout_mode = 2
-theme_override_font_sizes/font_size = 28
-disabled = true
-text = "TEST: Send MQTT Start"
-
-[node name="SkipButton" type="Button" parent="CenterContainer/VBoxContainer"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(400, 80)
-layout_mode = 2
-theme_override_font_sizes/font_size = 28
-text = "Start Game (Skip MQTT)"
-
-[node name="ConnectButton" type="Button" parent="CenterContainer/VBoxContainer"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(400, 80)
-layout_mode = 2
-theme_override_font_sizes/font_size = 24
-text = "Verbinden met MQTT"
-
-[node name="ConnectionLabel" type="Label" parent="."]
-unique_name_in_owner = true
-layout_mode = 1
-anchors_preset = 7
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = -150.0
-offset_top = -899.0
-offset_right = 150.0
-offset_bottom = -859.0
-grow_horizontal = 2
-grow_vertical = 0
-theme_override_font_sizes/font_size = 20
-text = "MQTT: Disconnected"
-horizontal_alignment = 1
+mouse_filter = 2

@@ -7,6 +7,7 @@ extends CanvasLayer
 @onready var team_name_label = %TeamNameLabel
 @onready var timer_label = %TimerLabel
 @onready var timer_node: Timer = %GameTimer
+@onready var top_bar = $TopBar
 
 # Score animation variables
 var displayed_score: int = 0
@@ -24,6 +25,12 @@ func _ready():
 	# Initialize display
 	update_score(GameManager.score)
 	update_player_name(GameManager.player_name)
+
+
+func set_topbar_visible(visible: bool):
+	"""Show or hide the top bar (for setup/finish screens)"""
+	if top_bar:
+		top_bar.visible = visible
 
 
 

@@ -295,16 +295,6 @@ func _process(delta):
 			# Client is in connecting/connected state but we don't know about it
 			# This shouldn't normally happen, but let's handle it
 			print("MQTTManager: Client state sync - appears to be connecting/connected")
-		
-		# Additional check: Verify socket health when we think we're connected
-		if mqtt_connected and actual_connection_mode == 20:  # BCM_CONNECTED = 20
-			var socket_ok = _check_socket_health()
-			if not socket_ok:
-				print("MQTTManager: Socket health check failed - forcing disconnect")
-				mqtt_client.disconnect_from_server()
-				mqtt_connected = false
-				is_reconnecting = false
-				reconnect_timer = 0.0
 	
 	if not auto_reconnect:
 		return

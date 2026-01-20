@@ -1,27 +1,31 @@
 extends Control
 
-# GO GO GO screen shown after game ends
-# Displays for 10 seconds then returns to setup screen
+# GO GO GO screen shown after game ends (matching Station-B finish state)
+# Displays team name, timer (00:00), and score in topbar
+# Auto-returns to setup screen after 60 seconds if no new game starts
 
 @onready var go_label: Label = %GoLabel
 @onready var timer_label: Label = %TimerLabel
 @onready var go_timer: Timer = %GoTimer
 
-var countdown_duration: float = 10.0
+var elapsed_time: float = 0.0
+var timeout_duration: float = 60.0  # 60 seconds to match Station-B
 
 
 func _ready():
 	print("GoScreen: Initialized")
-	# Get go screen time from config
-	countdown_duration = ConfigManager.get_go_screen_time()
-	print("GoScreen: Duration set to %d seconds" % countdown_duration)
 	
-	# Configure and start GOTimer
+	# Show overlay topbar on GO screen with team/score/timer info
+	if has_node("/root/Overlay"):
+		get_node("/root/Overlay").set_topbar_visible(true)
+	
+	# Reset elapsed time
+	elapsed_time = 0.0
+	
+	# Configure and start GOTimer (for MQTT start detection, not for timeout)
 	if go_timer:
-		go_timer.wait_time = countdown_duration
-		go_timer.one_shot = true
-		go_timer.timeout.connect(_return_to_setup)
-		go_timer.start()
+		# We'll handle timeout ourselves in _process
+		go_timer.stop()
 	
 	# Connect to MQTTManager signals to listen for new game start
 	if MQTTManager:
@@ -29,12 +33,20 @@ func _ready():
 		print("GoScreen: Connected to MQTT start signal")
 	else:
 		print("GoScreen: ERROR - MQTTManager not found!")
+	
+	# Update timer display to show 00:00
+	if timer_label:
+		timer_label.text = "00:00"
 
 
-func _process(_delta: float):
-	# Update timer label with remaining time
-	if go_timer and go_timer.time_left > 0 and timer_label:
-		timer_label.text = "Volgende ronde begint over: %d" % ceil(go_timer.time_left)
+func _process(delta: float):
+	# Update elapsed time
+	elapsed_time += delta
+	
+	# Check for timeout (60 seconds)
+	if elapsed_time >= timeout_duration:
+		print("GoScreen: 60 second timeout reached - returning to setup screen")
+		_return_to_setup()
 
 
 func _return_to_setup():
