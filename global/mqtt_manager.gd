@@ -45,7 +45,7 @@ var name_suggestions: Array = []  # Name suggestions from start message
 
 # Auto-reconnection settings
 var auto_reconnect: bool = true
-var reconnect_interval: float = 5.0  # Try to reconnect every 5 seconds
+var reconnect_interval: float = 10.0  # Try to reconnect every 10 seconds
 var reconnect_timer: float = 0.0
 var is_reconnecting: bool = false
 var connection_timeout: float = 10.0  # Timeout for connection attempts
@@ -168,8 +168,10 @@ func connect_to_broker(custom_ip: String = "", custom_port: int = 0):
 		if not is_reconnecting:
 			print("MQTTManager: State mismatch - forcing clean reconnection...")
 			mqtt_client.disconnect_from_server()
-			await get_tree().create_timer(0.5).timeout  # Wait for disconnect
-			# After disconnect, fall through to reconnect
+			# Don't await here - let the disconnect happen asynchronously
+			# The next reconnection attempt will handle it
+			is_reconnecting = false
+			return
 		else:
 			# Connection attempt already in progress
 			print("MQTTManager: Connection attempt already in progress...")
@@ -304,13 +306,16 @@ func _process(delta):
 	# Check for connection timeout
 	if is_reconnecting and mqtt_client and is_instance_valid(mqtt_client):
 		var current_time = Time.get_ticks_msec() / 1000.0
-		if mqtt_client.brokerconnectmode != 0 and (current_time - connection_start_time) > connection_timeout:
+		if connection_start_time > 0 and mqtt_client.brokerconnectmode != 0 and (current_time - connection_start_time) > connection_timeout:
 			print("MQTTManager: Connection attempt timed out after %.1f seconds" % connection_timeout)
+			print("MQTTManager: Broker state was: %d" % mqtt_client.brokerconnectmode)
 			# Force disconnect to reset state
 			mqtt_client.disconnect_from_server()
 			is_reconnecting = false
 			mqtt_connected = false
 			reconnect_timer = 0.0
+			connection_start_time = 0.0
+			last_error = true
 	
 	# Check if we should attempt reconnection
 	if not mqtt_connected and not is_reconnecting:
@@ -332,9 +337,14 @@ func _attempt_reconnection():
 		print("MQTTManager: Cannot reconnect - mqtt_client is invalid")
 		return
 	
-	# Check connection mode to avoid reconnecting if already in progress
+	# If broker state is stuck (not disconnected but we're not connected), force disconnect
 	if mqtt_client.brokerconnectmode != 0:  # BCM_NOCONNECTION = 0
-		# Connection attempt already in progress or connected
+		if not mqtt_connected and not is_reconnecting:
+			print("MQTTManager: Broker state stuck (mode: %d), forcing disconnect..." % mqtt_client.brokerconnectmode)
+			mqtt_client.disconnect_from_server()
+			# Will try again on next reconnect interval
+			return
+		# Connection attempt already in progress
 		return
 	
 	is_reconnecting = true
