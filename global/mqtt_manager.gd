@@ -285,6 +285,12 @@ func _process(delta):
 			mqtt_connected = false
 			is_reconnecting = false
 			reconnect_timer = 0.0
+		elif (actual_connection_mode == 0 or actual_connection_mode == 5) and is_reconnecting:
+			# We think we're reconnecting but client is in disconnected state
+			# This can happen when WiFi is unavailable and connection fails immediately
+			print("MQTTManager: Reconnection failed immediately (mode: %d) - will retry" % actual_connection_mode)
+			is_reconnecting = false
+			reconnect_timer = 0.0
 		elif actual_connection_mode != 0 and not mqtt_connected and not is_reconnecting:
 			# Client is in connecting/connected state but we don't know about it
 			# This shouldn't normally happen, but let's handle it
