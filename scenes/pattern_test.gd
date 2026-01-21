@@ -37,6 +37,10 @@ var hint_generation: int = 0  # Increments each question to cancel old hint sequ
 var hint_group_counter: int = 0  # Tracks how many hints shown in current group
 var hint_current_group_index: int = 0  # Which group we're in (for hint_color_groups)
 
+# Timer verification (for debugging)
+var timer_start_real_time: float = 0.0  # Real time when timer started
+var timer_expected_duration: float = 0.0  # Expected duration
+
 const NAME_INPUT_SCENE = preload("uid://c8k5xm6yl7wvh")
 const PATTERN_BOX_SCENE = preload("uid://c7kqvp4x7ejyh")
 
@@ -53,12 +57,14 @@ func _ready():
 	if question_timer_node:
 		question_timer_node.wait_time = question_timer_duration
 		question_timer_node.one_shot = true
+		question_timer_node.process_callback = Timer.TIMER_PROCESS_PHYSICS  # Use physics for consistent timing
 		question_timer_node.timeout.connect(_on_timer_expired)
 	
 	# Configure hint timer from scene
 	if hint_timer_node:
 		hint_timer_node.wait_time = hint_delay
 		hint_timer_node.one_shot = true
+		hint_timer_node.process_callback = Timer.TIMER_PROCESS_PHYSICS  # Use physics for consistent timing
 		hint_timer_node.timeout.connect(_start_hint_sequence)
 	
 	# Connect to GameManager signals
@@ -153,7 +159,10 @@ func load_next_question():
 	
 	# Start timers
 	if question_timer_node:
+		timer_start_real_time = Time.get_ticks_msec() / 1000.0  # Record real time
+		timer_expected_duration = question_timer_duration
 		question_timer_node.start()
+		print("Timer started - Expected: %.2fs, Real time: %.2f" % [timer_expected_duration, timer_start_real_time])
 	if hint_timer_node:
 		hint_timer_node.start()
 	
@@ -585,6 +594,14 @@ func _check_answer():
 
 func _on_timer_expired():
 	"""Called when question timer runs out - move to next question"""
+	# Verify timer accuracy
+	var real_time_now = Time.get_ticks_msec() / 1000.0
+	var actual_elapsed = real_time_now - timer_start_real_time
+	var error_seconds = actual_elapsed - timer_expected_duration
+	var error_percent = (error_seconds / timer_expected_duration) * 100.0
+	print("Timer expired - Expected: %.2fs, Actual: %.2fs, Error: %.2fs (%.1f%%)" % 
+		[timer_expected_duration, actual_elapsed, error_seconds, error_percent])
+	
 	# Stop any playing hint sounds
 	SfxManager.stop_all_sounds()
 	

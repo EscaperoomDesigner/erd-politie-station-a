@@ -21,13 +21,16 @@ var is_game_active: bool = false
 var timer_running: bool = false
 var time_remaining: float = 0.0
 var mqtt_publish_timer: float = 0.0  # Timer for MQTT updates
+var timer_start_real_time: float = 0.0  # For verification
+var timer_start_duration: float = 0.0  # For verification
 
 
 func _ready():
 	print("GameManager initialized")
 
 
-func _process(delta: float):
+func _physics_process(delta: float):
+	"""Use physics process for consistent timer updates at 60Hz"""
 	if timer_running and time_remaining > 0:
 		time_remaining -= delta
 		timer_updated.emit(time_remaining)
@@ -42,6 +45,15 @@ func _process(delta: float):
 		if time_remaining <= 0:
 			time_remaining = 0
 			timer_running = false
+			
+			# Verify timer accuracy
+			var real_time_now = Time.get_ticks_msec() / 1000.0
+			var actual_elapsed = real_time_now - timer_start_real_time
+			var error_seconds = actual_elapsed - timer_start_duration
+			var error_percent = (error_seconds / timer_start_duration) * 100.0
+			print("GameManager timer expired - Expected: %.1fs, Actual: %.2fs, Error: %.2fs (%.1f%%)" % 
+				[timer_start_duration, actual_elapsed, error_seconds, error_percent])
+			
 			end_game()
 
 
@@ -119,7 +131,11 @@ func start_timer(duration: float):
 	time_remaining = duration
 	timer_running = true
 	mqtt_publish_timer = 0.0  # Reset to publish immediately
+	timer_start_real_time = Time.get_ticks_msec() / 1000.0
+	timer_start_duration = duration
 	timer_updated.emit(time_remaining)
+	
+	print("GameManager timer started - Duration: %.1fs, Real time: %.2f" % [duration, timer_start_real_time])
 	
 	# Immediately publish initial time to MQTT
 	if has_node("/root/MQTTManager"):
