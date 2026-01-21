@@ -8,8 +8,8 @@ signal name_confirmed(player_name: String)
 @onready var timer_progress_bar = %TimerProgressBar
 
 # Timer variables
-var name_timer: float = 10.0
-var time_remaining: float = 10.0
+var name_timer: float = 30.0
+var time_remaining: float = 30.0
 var timer_active: bool = false
 
 
