@@ -41,6 +41,9 @@ var hint_current_group_index: int = 0  # Which group we're in (for hint_color_gr
 var timer_start_real_time: float = 0.0  # Real time when timer started
 var timer_expected_duration: float = 0.0  # Expected duration
 
+# Name input reference for cleanup
+var name_input_instance: Node = null
+
 const NAME_INPUT_SCENE = preload("uid://c8k5xm6yl7wvh")
 const PATTERN_BOX_SCENE = preload("uid://c7kqvp4x7ejyh")
 
@@ -74,6 +77,18 @@ func _ready():
 	_show_name_input()
 
 
+func _exit_tree():
+	"""Clean up when scene is being removed"""
+	# Clean up name input if it still exists
+	if name_input_instance != null and is_instance_valid(name_input_instance):
+		name_input_instance.queue_free()
+		name_input_instance = null
+	
+	# Disconnect from GameManager signals
+	if GameManager and GameManager.game_ended.is_connected(_on_game_time_expired):
+		GameManager.game_ended.disconnect(_on_game_time_expired)
+
+
 func _process(_delta: float):
 	"""Update timer progress bar every frame"""
 	if question_timer_node and question_timer_node.time_left > 0 and not is_answering:
@@ -98,13 +113,18 @@ func _process(_delta: float):
 func _show_name_input():
 	"""Toon het naam invoer scherm"""
 	visible = false
-	var name_input = NAME_INPUT_SCENE.instantiate()
-	name_input.name_confirmed.connect(_on_name_confirmed)
-	get_parent().add_child.call_deferred(name_input)
+	name_input_instance = NAME_INPUT_SCENE.instantiate()
+	name_input_instance.name_confirmed.connect(_on_name_confirmed)
+	get_parent().add_child.call_deferred(name_input_instance)
 
 
 func _on_name_confirmed(_player_name: String):
 	"""Start de test nadat naam is ingevuld"""
+	# Clean up the name input
+	if name_input_instance != null and is_instance_valid(name_input_instance):
+		name_input_instance.queue_free()
+		name_input_instance = null
+	
 	visible = true
 	GameManager.start_game()  # Start de game
 	# Timer is already running, don't restart it

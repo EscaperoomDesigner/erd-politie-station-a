@@ -524,10 +524,24 @@ func _handle_start_message(payload: String):
 		else:
 			name_suggestions = []
 		
+		# BUGFIX: If there's already an active session, end it first to clean up state
+		if is_session_active:
+			print("MQTTManager: Previous session still active - cleaning up before starting new session")
+			is_session_active = false
+			GameManager.end_game()
+		
+		# BUGFIX: Always reset game state before starting a new session
+		# This ensures timers, scores, and other state are properly cleared
+		GameManager.reset_game()
+		
+		# BUGFIX: Reset questions so they can be used again
+		if has_node("/root/QuestionManager"):
+			get_node("/root/QuestionManager").reset()
+		
 		current_team_name = team_name
 		is_session_active = true
 		
-		# Update GameManager
+		# Update GameManager with new session data
 		GameManager.set_player_name(team_name)
 		GameManager.set_score(previous_score)  # Set total score (includes other stations)
 		GameManager.station_score = 0  # Reset this station's score to 0
