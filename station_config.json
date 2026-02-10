@@ -1,7 +1,7 @@
 {
 	"mqtt": {
 		"broker_ip": "192.168.1.2",
-		"broker_port": 1883,
+		"broker_port": 1883.0,
 		"auto_connect": true,
 		"use_websocket": false
 	},
@@ -11,18 +11,18 @@
 	},
 	"display": {
 		"fullscreen": true,
-		"width": 1080,
-		"height": 1920,
+		"width": 1080.0,
+		"height": 1920.0,
 		"vsync": true
 	},
 	"game": {
-		"default_time": 200,
-		"go_screen_time": 10,
-		"question_timer": 30,
+		"default_time": 200.0,
+		"go_screen_time": 10.0,
+		"question_timer": 30.0,
 		"hint_delay": 8.0,
-		"points_per_question": 100,
-		"points_memory_3x3": 100,
-		"points_memory_4x4": 200,
-		"time_bonus_multiplier": 5
+		"points_per_question": 100.0,
+		"points_memory_3x3": 100.0,
+		"points_memory_4x4": 200.0,
+		"time_bonus_multiplier": 5.0
 	}
 }
