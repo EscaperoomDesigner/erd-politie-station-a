@@ -1,4 +1,4 @@
-[gd_scene load_steps=4 format=3 uid="uid://c8l3yqs7hfmxr"]
+[gd_scene format=3 uid="uid://c8l3yqs7hfmxr"]
 
 [ext_resource type="Script" uid="uid://dux8xs3t02d8e" path="res://scenes/setup_screen.gd" id="1_setup"]
 [ext_resource type="Theme" uid="uid://jdnk88f80sos" path="res://assets/politie_theme.tres" id="2_theme"]
@@ -8,7 +8,7 @@ bg_color = Color(0.2, 0.2, 0.2, 0.8235294)
 corner_radius_bottom_right = 16
 corner_radius_bottom_left = 16
 
-[node name="SetupScreen" type="Control"]
+[node name="SetupScreen" type="Control" unique_id=253070320]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -18,7 +18,7 @@ grow_vertical = 2
 theme = ExtResource("2_theme")
 script = ExtResource("1_setup")
 
-[node name="ColorRect" type="ColorRect" parent="."]
+[node name="ColorRect" type="ColorRect" parent="." unique_id=1166920215]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -27,7 +27,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.101961, 0.160784, 0.396078, 1)
 
-[node name="TopBar" type="Panel" parent="."]
+[node name="TopBar" type="Panel" parent="." unique_id=21279041]
 custom_minimum_size = Vector2(1920, 96)
 layout_mode = 1
 anchors_preset = 10
@@ -36,7 +36,7 @@ offset_bottom = 96.0
 grow_horizontal = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_topbar")
 
-[node name="StatusLabel" type="Label" parent="TopBar"]
+[node name="StatusLabel" type="Label" parent="TopBar" unique_id=1133188533]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 8
@@ -52,12 +52,12 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_font_sizes/font_size = 42
-text = ""
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="WaitingLabel" type="Label" parent="."]
+[node name="WaitingLabel" type="Label" parent="." unique_id=1587138301]
 unique_name_in_owner = true
+visible = false
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -72,12 +72,10 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_font_sizes/font_size = 72
-text = ""
 horizontal_alignment = 1
 vertical_alignment = 1
-visible = false
 
-[node name="SpinnerDrawer" type="Control" parent="."]
+[node name="SpinnerDrawer" type="Control" parent="." unique_id=1196763449]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
@@ -86,3 +84,20 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
+
+[node name="Button" type="Button" parent="." unique_id=852943542]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -4.0
+offset_top = -4.0
+offset_right = 4.0
+offset_bottom = 4.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "TEST START"

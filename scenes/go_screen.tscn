@@ -1,9 +1,11 @@
-[gd_scene load_steps=3 format=3 uid="uid://dkcpxxn7l8nba"]
+[gd_scene format=3 uid="uid://dkcpxxn7l8nba"]
 
 [ext_resource type="Script" uid="uid://1ch0rvxojama" path="res://scenes/go_screen.gd" id="1_go"]
 [ext_resource type="Theme" uid="uid://jdnk88f80sos" path="res://assets/politie_theme.tres" id="2_theme"]
+[ext_resource type="PackedScene" uid="uid://07gmh0ei6iwq" path="res://components/arrow_texture.tscn" id="3_p0dfg"]
+[ext_resource type="AudioStream" uid="uid://g4j0qjfbda10" path="res://assets/sfx/go_sfx.mp3" id="4_wdmp3"]
 
-[node name="GoScreen" type="Control"]
+[node name="GoScreen" type="Control" unique_id=2136730638]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -13,12 +15,12 @@ grow_vertical = 2
 theme = ExtResource("2_theme")
 script = ExtResource("1_go")
 
-[node name="GoTimer" type="Timer" parent="."]
+[node name="GoTimer" type="Timer" parent="." unique_id=784982526]
 unique_name_in_owner = true
 wait_time = 10.0
 one_shot = true
 
-[node name="ColorRect" type="ColorRect" parent="."]
+[node name="ColorRect" type="ColorRect" parent="." unique_id=1325805741]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -27,7 +29,14 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.101961, 0.160784, 0.396078, 1)
 
-[node name="CenterContainer" type="CenterContainer" parent="."]
+[node name="ArrowTexture" parent="." unique_id=335551894 instance=ExtResource("3_p0dfg")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+offset_top = 470.0
+offset_bottom = 1110.0
+
+[node name="CenterContainer" type="CenterContainer" parent="." unique_id=1865916027]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -35,11 +44,11 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer" unique_id=294287079]
 layout_mode = 2
 theme_override_constants/separation = 50
 
-[node name="GoLabel" type="Label" parent="CenterContainer/VBoxContainer"]
+[node name="GoLabel" type="Label" parent="CenterContainer/VBoxContainer" unique_id=793798214]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
@@ -47,3 +56,8 @@ theme_override_font_sizes/font_size = 150
 text = "GO GO GO!"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="." unique_id=1784456819]
+unique_name_in_owner = true
+stream = ExtResource("4_wdmp3")
+bus = &"sfx"

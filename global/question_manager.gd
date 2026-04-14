@@ -62,27 +62,27 @@ func _load_questions():
 		"Het alfabet achterstevoren"
 	))
 	
-	# Vraag 4: Verticaal patroon in 2 kolommen
-	# Kolom 1 (boven naar beneden): W -> S -> O -> K (telkens -4)
-	# Kolom 2 (boven naar beneden): P -> L -> H -> D (telkens -4)
-	# Visueel:  W  P
-	#           S  L
-	#           O  H
-	#           ?  ?
-	# Hint: Show left column top to bottom, then right column top to bottom
-	all_questions.append(QuestionData.new(
-		"q4",
-		["W", "P", "S", "L", "O", "H", "K", ""],
-		[7],
-		["D"],
-		2,
-		"Lees elke kolom van boven naar beneden",
-		true,   # vertical_layout = true
-		false,  # single_row
-		false,  # dpad_layout
-		false,  # uses_numbers
-		[0, 2, 4, 6, 1, 3, 5]  # hint_sequence: Left column (W,S,O,K), then right column (P,L,H)
-	))
+	# # Vraag 4: Verticaal patroon in 2 kolommen
+	# # Kolom 1 (boven naar beneden): W -> S -> O -> K (telkens -4)
+	# # Kolom 2 (boven naar beneden): P -> L -> H -> D (telkens -4)
+	# # Visueel:  W  P
+	# #           S  L
+	# #           O  H
+	# #           ?  ?
+	# # Hint: Show left column top to bottom, then right column top to bottom
+	# all_questions.append(QuestionData.new(
+	# 	"q4",
+	# 	["W", "P", "S", "L", "O", "H", "K", ""],
+	# 	[7],
+	# 	["D"],
+	# 	2,
+	# 	"Lees elke kolom van boven naar beneden",
+	# 	true,   # vertical_layout = true
+	# 	false,  # single_row
+	# 	false,  # dpad_layout
+	# 	false,  # uses_numbers
+	# 	[0, 2, 4, 6, 1, 3, 5]  # hint_sequence: Left column (W,S,O,K), then right column (P,L,H)
+	# ))
 	
 	# SECTIE 2: Herhalings patronen
 	
@@ -91,9 +91,9 @@ func _load_questions():
 	# Hint: Show each unique letter with a different color (A=color1, B=color2, C=color3, D=color4)
 	all_questions.append(QuestionData.new(
 		"q5",
-		["A", "B", "B", "C", "C", "C", "D", "", "", ""],
-		[7, 8, 9],
-		["D", "D", "D"],
+		["A", "B", "B", "C", "C", "C", "D", "D", "", ""],
+		[8, 9],
+		["D", "D"],
 		2,
 		"Elke letter verschijnt vaker dan de vorige",
 		false,  # vertical_layout
@@ -108,50 +108,50 @@ func _load_questions():
 	
 	# SECTIE 3: Cijfer patronen
 	
-	# Vraag 6: 1, 1, 2, 3, 5, _, 13, 21
-	# Patroon: Fibonacci (elke getal is som van vorige twee)
-	# Hint: Show pairs that add up: 1+1 (green), 1+2 (cyan), 2+3 (yellow), 3+5 (magenta)
-	all_questions.append(QuestionData.new(
-		"q6",
-		["1", "1", "2", "3", "5", "", "13", "21"],
-		[5],
-		["8"],
-		3,
-		"Som van de twee vorige getallen",
-		false,  # vertical_layout
-		true,   # single_row
-		false,  # dpad_layout
-		true,   # uses_numbers
-		[0, 1, 1, 2, 2, 3, 3, 4],  # hint_sequence: Show pairs: 1+1 (green), 1+2 (cyan), 2+3 (yellow), 3+5 (magenta)
-		true    # hint_show_pairs = show additions in pairs with different colors
-	))
+	# # Vraag 6: 1, 1, 2, 3, 5, _, 13, 21
+	# # Patroon: Fibonacci (elke getal is som van vorige twee)
+	# # Hint: Show pairs that add up: 1+1 (green), 1+2 (cyan), 2+3 (yellow), 3+5 (magenta)
+	# all_questions.append(QuestionData.new(
+	# 	"q6",
+	# 	["1", "1", "2", "3", "5", "", "13", "21"],
+	# 	[5],
+	# 	["8"],
+	# 	3,
+	# 	"Som van de twee vorige getallen",
+	# 	false,  # vertical_layout
+	# 	true,   # single_row
+	# 	false,  # dpad_layout
+	# 	true,   # uses_numbers
+	# 	[0, 1, 1, 2, 2, 3, 3, 4],  # hint_sequence: Show pairs: 1+1 (green), 1+2 (cyan), 2+3 (yellow), 3+5 (magenta)
+	# 	true    # hint_show_pairs = show additions in pairs with different colors
+	# ))
 	
-	# Vraag 7: H i j ? en t s r ?
-	# Rij 1 (vooruit): H, i, j, k
-	# Rij 2 (achteruit): t, s, r, q
-	# Hint: Show top row first (H,I,J,K forward), then bottom row (T,S,R backward)
-	all_questions.append(QuestionData.new(
-		"q7",
-		["H", "T", "I", "S", "J", "R", "K", ""],
-		[7],
-		["Q"],
-		2,
-		"Bovenste rij: vooruit, onderste rij: achteruit",
-		false,  # vertical_layout = true
-		false,  # single_row
-		false,  # dpad_layout
-		false,  # uses_numbers
-		[0, 2, 4, 6, 1, 3, 5]  # hint_sequence: Top row (H,I,J,K), then bottom row (T,S,R)
-	))
+	# # Vraag 7: H i j ? en t s r ?
+	# # Rij 1 (vooruit): H, i, j, k
+	# # Rij 2 (achteruit): t, s, r, q
+	# # Hint: Show top row first (H,I,J,K forward), then bottom row (T,S,R backward)
+	# all_questions.append(QuestionData.new(
+	# 	"q7",
+	# 	["H", "T", "I", "S", "J", "R", "K", ""],
+	# 	[7],
+	# 	["Q"],
+	# 	2,
+	# 	"Bovenste rij: vooruit, onderste rij: achteruit",
+	# 	false,  # vertical_layout = true
+	# 	false,  # single_row
+	# 	false,  # dpad_layout
+	# 	false,  # uses_numbers
+	# 	[0, 2, 4, 6, 1, 3, 5]  # hint_sequence: Top row (H,I,J,K), then bottom row (T,S,R)
+	# ))
 	
 	# Vraag 8: egiywuk -> k, u, w, y, _, g, e
 	# Toon eerst het woord, dan de puzzel (gespiegeld)
 	# Hint: Show pairs simultaneously - both K's, then both U's, etc. (mirror pattern)
 	all_questions.append(QuestionData.new(
 		"q8",
-		["E", "G", "I", "Y", "W", "U", "K", SPACE_MARKER, "K", "U", "W", "Y", "", "G", "E"],
-		[12],
-		["I"],
+		["E", "G", "I", "Y", "W", "U", "K", SPACE_MARKER, "K", "", "W", "Y", "", "G", "E"],
+		[9, 12],
+		["U", "I"],
 		2,
 		"Spiegel het woord naar rechts",
 		false,  # vertical_layout
@@ -162,23 +162,23 @@ func _load_questions():
 		true    # hint_show_pairs = true (show 2 at once, except for I which has -1 marker)
 	))
 	
-	# Vraag 9: C F / T R, H K / O M, M ? / J ?
-	# Patroon in squares: Top row: +3, +2, +3, +2 = C(2), F(5), H(7), K(10), M(12), P(15)
-	# Bottom row: -2, -3, -2, -3 = T(19), R(17), O(14), M(12), J(9), H(7)
-	# Hint: Show top row sequence, then bottom row to reveal both patterns
-	all_questions.append(QuestionData.new(
-		"q9",
-		["C", "T", "F", "R", SPACE_MARKER, "H", "O", "K", "M", SPACE_MARKER, "M", "J", "P", ""],
-		[13],
-		["H"],
-		3,
-		"Zoek het patroon in de rijen van elk vierkant",
-		false,  # vertical_layout
-		false,  # single_row
-		false,  # dpad_layout
-		false,  # uses_numbers
-		[0, 2, 5, 7, 10, 12, 1, 3, 6, 8, 11]  # hint_sequence: Top row (C,F,H,K,M,P), then bottom row (T,R,O,M,J)
-	))
+	# # Vraag 9: C F / T R, H K / O M, M ? / J ?
+	# # Patroon in squares: Top row: +3, +2, +3, +2 = C(2), F(5), H(7), K(10), M(12), P(15)
+	# # Bottom row: -2, -3, -2, -3 = T(19), R(17), O(14), M(12), J(9), H(7)
+	# # Hint: Show top row sequence, then bottom row to reveal both patterns
+	# all_questions.append(QuestionData.new(
+	# 	"q9",
+	# 	["C", "T", "F", "R", SPACE_MARKER, "H", "O", "K", "M", SPACE_MARKER, "M", "J", "P", ""],
+	# 	[13],
+	# 	["H"],
+	# 	3,
+	# 	"Zoek het patroon in de rijen van elk vierkant",
+	# 	false,  # vertical_layout
+	# 	false,  # single_row
+	# 	false,  # dpad_layout
+	# 	false,  # uses_numbers
+	# 	[0, 2, 5, 7, 10, 12, 1, 3, 6, 8, 11]  # hint_sequence: Top row (C,F,H,K,M,P), then bottom row (T,R,O,M,J)
+	# ))
 	
 	# Vraag 10: 3, 5, 7, 9, 11, _
 	# Patroon: +2 elke keer (oneven getallen)

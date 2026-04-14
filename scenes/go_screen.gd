@@ -6,26 +6,34 @@ extends Control
 
 @onready var go_label: Label = %GoLabel
 @onready var go_timer: Timer = %GoTimer
+@onready var go_arrow: PackedScene = preload("uid://07gmh0ei6iwq")
+@onready var audio_player: AudioStreamPlayer = %AudioStreamPlayer
 
 var elapsed_time: float = 0.0
 var timeout_duration: float = 60.0  # 60 seconds to match Station-B
 
+var _arrows: Array = []
+const ARROW_SPEED: float = 700.0
+const ARROW_COUNT: int = 3
+const ARROW_W: float = 640.0
+const ARROW_H: float = 640.0
+
 
 func _ready():
 	print("GoScreen: Initialized")
-	
+
 	# Show overlay topbar on GO screen with team/score/timer info
 	if has_node("/root/Overlay"):
 		get_node("/root/Overlay").set_topbar_visible(true)
-	
+
 	# Reset elapsed time
 	elapsed_time = 0.0
-	
+
 	# Configure and start GOTimer (for MQTT start detection, not for timeout)
 	if go_timer:
 		# We'll handle timeout ourselves in _process
 		go_timer.stop()
-	
+
 	# Connect to MQTTManager signals to listen for new game start
 	if MQTTManager:
 		MQTTManager.game_start_received.connect(_on_mqtt_start_received)
@@ -33,11 +41,34 @@ func _ready():
 	else:
 		print("GoScreen: ERROR - MQTTManager not found!")
 
+	_spawn_arrows()
+
+	# Play GO sound
+	audio_player.play()
+
+
+func _spawn_arrows() -> void:
+	var screen_w: float = get_viewport_rect().size.x
+	var y_pos: float = 470.0
+	var spacing: float = (screen_w + ARROW_W) / ARROW_COUNT
+
+	for i in range(ARROW_COUNT):
+		var arrow = go_arrow.instantiate()
+		add_child(arrow)
+		arrow.position = Vector2(-ARROW_W + spacing * i, y_pos)
+		_arrows.append(arrow)
+
 
 func _process(delta: float):
+	# Move arrows left to right, wrap when off-screen right
+	for arrow in _arrows:
+		arrow.position.x += ARROW_SPEED * delta
+		if arrow.position.x > get_viewport_rect().size.x:
+			arrow.position.x = -ARROW_W
+
 	# Update elapsed time
 	elapsed_time += delta
-	
+
 	# Check for timeout (60 seconds)
 	if elapsed_time >= timeout_duration:
 		print("GoScreen: 60 second timeout reached - returning to setup screen")

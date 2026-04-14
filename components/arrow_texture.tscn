@@ -1,0 +1,11 @@
+[gd_scene format=3 uid="uid://07gmh0ei6iwq"]
+
+[ext_resource type="Texture2D" uid="uid://u7v4uxk2p73p" path="res://assets/go_arrow_1.svg" id="1_pokj0"]
+
+[node name="ArrowTexture" type="TextureRect" unique_id=335551894]
+texture_filter = 4
+offset_left = 640.0
+offset_top = 469.0
+offset_right = 1280.0
+offset_bottom = 1109.0
+texture = ExtResource("1_pokj0")

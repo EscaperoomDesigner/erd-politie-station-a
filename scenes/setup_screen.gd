@@ -5,6 +5,7 @@ extends Control
 @onready var status_label: Label = %StatusLabel
 @onready var waiting_label: Label = %WaitingLabel
 @onready var spinner_drawer: Control = %SpinnerDrawer
+@onready var test_start_button: Button = %Button
 
 # Spinner animation
 var loading_angle: float = 0.0
@@ -22,6 +23,10 @@ func _ready():
 		MQTTManager.game_start_received.connect(_on_mqtt_start_received)
 	else:
 		print("SetupScreen: ERROR - MQTTManager not found!")
+
+	# Connect test start button
+	if test_start_button:
+		test_start_button.pressed.connect(_on_test_start_pressed)
 	
 	# Connect spinner drawer's draw function
 	if spinner_drawer:
@@ -62,15 +67,15 @@ func _update_connection_status():
 	if waiting_label:
 		if is_connected:
 			waiting_label.text = "wachten op start signaal..."
-			waiting_label.visible = true
-			waiting_label.modulate = Color.WHITE
 		else:
-			waiting_label.visible = false
+			waiting_label.text = "verbinding maken..."
+		waiting_label.visible = true
+		waiting_label.modulate = Color.WHITE
 
 
 func _draw_spinner():
 	"""Draw the loading spinner (only when connected)"""
-	if MQTTManager and MQTTManager.mqtt_connected and waiting_label and waiting_label.visible:
+	if waiting_label and waiting_label.visible:
 		# Get center position below waiting text
 		var center_x = spinner_drawer.size.x / 2
 		var center_y = spinner_drawer.size.y / 2 + 120
@@ -93,6 +98,17 @@ func _draw_spinner():
 		
 		if points.size() > 1:
 			spinner_drawer.draw_polyline(points, Color.WHITE, thickness)
+
+
+func _on_test_start_pressed():
+	"""Manually trigger game start for testing"""
+	print("SetupScreen: Test start button pressed")
+	GameManager.reset_game()
+	GameManager.set_player_name("Test Team")
+	GameManager.start_timer(20.0)
+	GameManager.start_game()
+	if MQTTManager:
+		MQTTManager.game_start_received.emit()
 
 
 func _on_mqtt_start_received():
