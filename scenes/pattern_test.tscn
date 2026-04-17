@@ -1,9 +1,12 @@
-[gd_scene load_steps=3 format=3 uid="uid://bo3qkm2gv7u7v"]
+[gd_scene format=3 uid="uid://bo3qkm2gv7u7v"]
 
 [ext_resource type="Script" uid="uid://cg14h5dq1wnry" path="res://scenes/pattern_test.gd" id="1_xh4mn"]
 [ext_resource type="Theme" uid="uid://c21uk7nolmdu6" path="res://assets/keyboard_button.tres" id="2_ucsc3"]
 
-[node name="PatternTest" type="Control"]
+[sub_resource type="LabelSettings" id="LabelSettings_ucsc3"]
+font_size = 54
+
+[node name="PatternTest" type="Control" unique_id=251313504]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -12,15 +15,15 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_xh4mn")
 
-[node name="QuestionTimer" type="Timer" parent="."]
+[node name="QuestionTimer" type="Timer" parent="." unique_id=1574383661]
 unique_name_in_owner = true
 one_shot = true
 
-[node name="HintTimer" type="Timer" parent="."]
+[node name="HintTimer" type="Timer" parent="." unique_id=920374736]
 unique_name_in_owner = true
 one_shot = true
 
-[node name="FeedbackLabel" type="Label" parent="."]
+[node name="FeedbackLabel" type="Label" parent="." unique_id=1850486779]
 unique_name_in_owner = true
 z_index = 100
 layout_mode = 1
@@ -28,16 +31,16 @@ anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
 offset_left = -0.5
-offset_top = 96.0
+offset_top = 572.885
 offset_right = 0.5
-offset_bottom = 163.0
+offset_bottom = 639.885
 grow_horizontal = 2
 size_flags_horizontal = 4
 size_flags_vertical = 0
 theme_override_font_sizes/font_size = 48
 horizontal_alignment = 1
 
-[node name="MarginContainer" type="MarginContainer" parent="."]
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=1494179447]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -49,26 +52,26 @@ theme_override_constants/margin_top = 128
 theme_override_constants/margin_right = 64
 theme_override_constants/margin_bottom = 64
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer" unique_id=1146939999]
 custom_minimum_size = Vector2(1792, 824)
 layout_mode = 2
 alignment = 2
 
-[node name="HintLabel" type="Label" parent="MarginContainer/VBoxContainer"]
+[node name="HintLabel" type="Label" parent="MarginContainer/VBoxContainer" unique_id=1393907225]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
 text = "Vul de lege vakjes in"
 horizontal_alignment = 1
 
-[node name="SequenceContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer"]
+[node name="SequenceContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer" unique_id=402841049]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(1792, 0)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 6
 
-[node name="KeyboardContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer"]
+[node name="KeyboardContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer" unique_id=443549396]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(1300, 380)
 layout_mode = 2
@@ -76,187 +79,187 @@ size_flags_horizontal = 4
 size_flags_vertical = 4
 theme = ExtResource("2_ucsc3")
 
-[node name="Title" type="Label" parent="MarginContainer/VBoxContainer/KeyboardContainer"]
+[node name="Title" type="Label" parent="MarginContainer/VBoxContainer/KeyboardContainer" unique_id=434489048]
 layout_mode = 2
 theme_override_font_sizes/font_size = 32
 text = "Klik om te kiezen"
 horizontal_alignment = 1
 
-[node name="Row1" type="HBoxContainer" parent="MarginContainer/VBoxContainer/KeyboardContainer"]
+[node name="Row1" type="HBoxContainer" parent="MarginContainer/VBoxContainer/KeyboardContainer" unique_id=18738378]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 0
 alignment = 1
 
-[node name="A" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row1"]
+[node name="A" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row1" unique_id=1135316566]
 custom_minimum_size = Vector2(96, 96)
 layout_mode = 2
 theme_override_font_sizes/font_size = 64
 text = "A"
 
-[node name="B" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row1"]
+[node name="B" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row1" unique_id=464978952]
 custom_minimum_size = Vector2(96, 96)
 layout_mode = 2
 theme_override_font_sizes/font_size = 64
 text = "B"
 
-[node name="C" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row1"]
+[node name="C" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row1" unique_id=1747636956]
 custom_minimum_size = Vector2(96, 96)
 layout_mode = 2
 theme_override_font_sizes/font_size = 64
 text = "C"
 
-[node name="D" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row1"]
+[node name="D" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row1" unique_id=1315338954]
 custom_minimum_size = Vector2(96, 96)
 layout_mode = 2
 theme_override_font_sizes/font_size = 64
 text = "D"
 
-[node name="E" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row1"]
+[node name="E" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row1" unique_id=462287353]
 custom_minimum_size = Vector2(96, 96)
 layout_mode = 2
 theme_override_font_sizes/font_size = 64
 text = "E"
 
-[node name="F" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row1"]
+[node name="F" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row1" unique_id=559616531]
 custom_minimum_size = Vector2(96, 96)
 layout_mode = 2
 theme_override_font_sizes/font_size = 64
 text = "F"
 
-[node name="G" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row1"]
+[node name="G" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row1" unique_id=1107517104]
 custom_minimum_size = Vector2(96, 96)
 layout_mode = 2
 theme_override_font_sizes/font_size = 64
 text = "G"
 
-[node name="H" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row1"]
+[node name="H" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row1" unique_id=1070566610]
 custom_minimum_size = Vector2(96, 96)
 layout_mode = 2
 theme_override_font_sizes/font_size = 64
 text = "H"
 
-[node name="I" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row1"]
+[node name="I" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row1" unique_id=1796523903]
 custom_minimum_size = Vector2(96, 96)
 layout_mode = 2
 theme_override_font_sizes/font_size = 64
 text = "I"
 
-[node name="J" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row1"]
+[node name="J" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row1" unique_id=2117811553]
 custom_minimum_size = Vector2(96, 96)
 layout_mode = 2
 theme_override_font_sizes/font_size = 64
 text = "J"
 
-[node name="K" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row1"]
+[node name="K" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row1" unique_id=1408045789]
 custom_minimum_size = Vector2(96, 96)
 layout_mode = 2
 theme_override_font_sizes/font_size = 64
 text = "K"
 
-[node name="L" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row1"]
+[node name="L" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row1" unique_id=667664281]
 custom_minimum_size = Vector2(96, 96)
 layout_mode = 2
 theme_override_font_sizes/font_size = 64
 text = "L"
 
-[node name="M" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row1"]
+[node name="M" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row1" unique_id=550109012]
 custom_minimum_size = Vector2(96, 96)
 layout_mode = 2
 theme_override_font_sizes/font_size = 64
 text = "M"
 
-[node name="Row2" type="HBoxContainer" parent="MarginContainer/VBoxContainer/KeyboardContainer"]
+[node name="Row2" type="HBoxContainer" parent="MarginContainer/VBoxContainer/KeyboardContainer" unique_id=2071002488]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 0
 alignment = 1
 
-[node name="N" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row2"]
+[node name="N" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row2" unique_id=567172277]
 custom_minimum_size = Vector2(96, 96)
 layout_mode = 2
 theme_override_font_sizes/font_size = 64
 text = "N"
 
-[node name="O" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row2"]
+[node name="O" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row2" unique_id=1357826751]
 custom_minimum_size = Vector2(96, 96)
 layout_mode = 2
 theme_override_font_sizes/font_size = 64
 text = "O"
 
-[node name="P" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row2"]
+[node name="P" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row2" unique_id=1375365378]
 custom_minimum_size = Vector2(96, 96)
 layout_mode = 2
 theme_override_font_sizes/font_size = 64
 text = "P"
 
-[node name="Q" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row2"]
+[node name="Q" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row2" unique_id=944807128]
 custom_minimum_size = Vector2(96, 96)
 layout_mode = 2
 theme_override_font_sizes/font_size = 64
 text = "Q"
 
-[node name="R" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row2"]
+[node name="R" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row2" unique_id=1831681272]
 custom_minimum_size = Vector2(96, 96)
 layout_mode = 2
 theme_override_font_sizes/font_size = 64
 text = "R"
 
-[node name="S" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row2"]
+[node name="S" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row2" unique_id=952069570]
 custom_minimum_size = Vector2(96, 96)
 layout_mode = 2
 theme_override_font_sizes/font_size = 64
 text = "S"
 
-[node name="T" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row2"]
+[node name="T" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row2" unique_id=483906800]
 custom_minimum_size = Vector2(96, 96)
 layout_mode = 2
 theme_override_font_sizes/font_size = 64
 text = "T"
 
-[node name="U" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row2"]
+[node name="U" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row2" unique_id=346045947]
 custom_minimum_size = Vector2(96, 96)
 layout_mode = 2
 theme_override_font_sizes/font_size = 64
 text = "U"
 
-[node name="V" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row2"]
+[node name="V" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row2" unique_id=1315854454]
 custom_minimum_size = Vector2(96, 96)
 layout_mode = 2
 theme_override_font_sizes/font_size = 64
 text = "V"
 
-[node name="W" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row2"]
+[node name="W" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row2" unique_id=116143991]
 custom_minimum_size = Vector2(96, 96)
 layout_mode = 2
 theme_override_font_sizes/font_size = 64
 text = "W"
 
-[node name="X" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row2"]
+[node name="X" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row2" unique_id=1217406957]
 custom_minimum_size = Vector2(96, 96)
 layout_mode = 2
 theme_override_font_sizes/font_size = 64
 text = "X"
 
-[node name="Y" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row2"]
+[node name="Y" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row2" unique_id=1945515086]
 custom_minimum_size = Vector2(96, 96)
 layout_mode = 2
 theme_override_font_sizes/font_size = 64
 text = "Y"
 
-[node name="Z" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row2"]
+[node name="Z" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row2" unique_id=746379418]
 custom_minimum_size = Vector2(96, 96)
 layout_mode = 2
 theme_override_font_sizes/font_size = 64
 text = "Z"
 
-[node name="Row3" type="HBoxContainer" parent="MarginContainer/VBoxContainer/KeyboardContainer"]
+[node name="Row3" type="HBoxContainer" parent="MarginContainer/VBoxContainer/KeyboardContainer" unique_id=1610387014]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(1300, 0)
 layout_mode = 2
 alignment = 1
 
-[node name="0" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row3"]
+[node name="0" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row3" unique_id=57393022]
 custom_minimum_size = Vector2(96, 96)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -264,7 +267,7 @@ size_flags_vertical = 4
 theme_override_font_sizes/font_size = 64
 text = "0"
 
-[node name="1" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row3"]
+[node name="1" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row3" unique_id=649833645]
 custom_minimum_size = Vector2(96, 96)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -272,7 +275,7 @@ size_flags_vertical = 4
 theme_override_font_sizes/font_size = 64
 text = "1"
 
-[node name="2" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row3"]
+[node name="2" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row3" unique_id=1197072528]
 custom_minimum_size = Vector2(96, 96)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -280,7 +283,7 @@ size_flags_vertical = 4
 theme_override_font_sizes/font_size = 64
 text = "2"
 
-[node name="3" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row3"]
+[node name="3" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row3" unique_id=1829728434]
 custom_minimum_size = Vector2(96, 96)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -288,7 +291,7 @@ size_flags_vertical = 4
 theme_override_font_sizes/font_size = 64
 text = "3"
 
-[node name="4" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row3"]
+[node name="4" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row3" unique_id=889203232]
 custom_minimum_size = Vector2(96, 96)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -296,7 +299,7 @@ size_flags_vertical = 4
 theme_override_font_sizes/font_size = 64
 text = "4"
 
-[node name="5" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row3"]
+[node name="5" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row3" unique_id=778226633]
 custom_minimum_size = Vector2(96, 96)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -304,7 +307,7 @@ size_flags_vertical = 4
 theme_override_font_sizes/font_size = 64
 text = "5"
 
-[node name="6" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row3"]
+[node name="6" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row3" unique_id=2131754475]
 custom_minimum_size = Vector2(96, 96)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -312,7 +315,7 @@ size_flags_vertical = 4
 theme_override_font_sizes/font_size = 64
 text = "6"
 
-[node name="7" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row3"]
+[node name="7" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row3" unique_id=1382490996]
 custom_minimum_size = Vector2(96, 96)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -320,7 +323,7 @@ size_flags_vertical = 4
 theme_override_font_sizes/font_size = 64
 text = "7"
 
-[node name="8" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row3"]
+[node name="8" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row3" unique_id=825984091]
 custom_minimum_size = Vector2(96, 96)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -328,7 +331,7 @@ size_flags_vertical = 4
 theme_override_font_sizes/font_size = 64
 text = "8"
 
-[node name="9" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row3"]
+[node name="9" type="Button" parent="MarginContainer/VBoxContainer/KeyboardContainer/Row3" unique_id=1498974806]
 custom_minimum_size = Vector2(96, 96)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -336,7 +339,7 @@ size_flags_vertical = 4
 theme_override_font_sizes/font_size = 64
 text = "9"
 
-[node name="TimerProgressBar" type="ProgressBar" parent="."]
+[node name="TimerProgressBar" type="ProgressBar" parent="." unique_id=198996920]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(1920, 48)
 layout_mode = 0
@@ -348,3 +351,13 @@ max_value = 1.0
 step = 0.001
 value = 1.0
 show_percentage = false
+
+[node name="Label" type="Label" parent="." unique_id=1825188235]
+layout_mode = 1
+anchors_preset = -1
+offset_left = 762.0
+offset_top = 95.0
+offset_right = 1587.0
+offset_bottom = 218.00009
+text = "Cognitieve Test"
+label_settings = SubResource("LabelSettings_ucsc3")
