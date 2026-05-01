@@ -226,35 +226,35 @@ func _load_questions():
 	# Boven: 3, 5, 8, 4, 1, 9, ?
 	# Onder: 33, 55, 88, 44, 11, 99, 77
 	# Patroon: elk getal boven wordt × 11 (gedupliceerd) onder
-	all_questions.append(QuestionData.new(
-		"q12",
-		["3", "33", "5", "55", "8", "88", "4", "44", "1", "11", "9", "99", "", "77"],
-		[12],
-		["7"],
-		2,
-		"Vergelijk de bovenste en onderste rij",
-		false,  # vertical_layout
-		false,  # single_row
-		false,  # dpad_layout
-		true    # uses_numbers
-	))
+	# all_questions.append(QuestionData.new(
+	# 	"q12",
+	# 	["3", "33", "5", "55", "8", "88", "4", "44", "1", "11", "9", "99", "", "77"],
+	# 	[12],
+	# 	["7"],
+	# 	2,
+	# 	"Vergelijk de bovenste en onderste rij",
+	# 	false,  # vertical_layout
+	# 	false,  # single_row
+	# 	false,  # dpad_layout
+	# 	true    # uses_numbers
+	# ))
 	
 	# Vraag 13: A C B D, H O K M, I K ? ?
 	# Patroon in squares: EACH SQUARE ABCD EFGH IJKL
 	# Hint: Show top row sequence, then bottom row to reveal both patterns
-	all_questions.append(QuestionData.new(
-		"q9",
-		["A", "D", "C", "B", SPACE_MARKER, "E", "H", "G", "F", SPACE_MARKER, "I", "L", "K", ""],
-		[13],
-		["J"],
-		3,
-		"Combineer de patronen in elk vierkant",
-		false,  # vertical_layout
-		false,  # single_row
-		false,  # dpad_layout
-		false,  # uses_numbers
-		[0, 3, 2, 1, 5, 8, 7, 6, 10, -1, 12, 11] 
-	))
+	# all_questions.append(QuestionData.new(
+	# 	"q9",
+	# 	["A", "D", "C", "B", SPACE_MARKER, "E", "H", "G", "F", SPACE_MARKER, "I", "L", "K", ""],
+	# 	[13],
+	# 	["J"],
+	# 	3,
+	# 	"Combineer de patronen in elk vierkant",
+	# 	false,  # vertical_layout
+	# 	false,  # single_row
+	# 	false,  # dpad_layout
+	# 	false,  # uses_numbers
+	# 	[0, 3, 2, 1, 5, 8, 7, 6, 10, -1, 12, 11] 
+	# ))
 
 	print("Loaded ", all_questions.size(), " questions")
 
