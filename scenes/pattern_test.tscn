@@ -359,5 +359,5 @@ offset_left = 762.0
 offset_top = 95.0
 offset_right = 1587.0
 offset_bottom = 218.00009
-text = "Cognitieve Test"
+text = "COGNITIEVE-TEST"
 label_settings = SubResource("LabelSettings_ucsc3")
