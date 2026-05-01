@@ -143,7 +143,7 @@ func load_next_question():
 	
 	if current_question == null:
 		# Game finished - transition to memory game
-		feedback_label.text = "Test voltooid! Alle vragen beantwoord.\nJe score: €" + str(GameManager.score)
+		feedback_label.text = "Test voltooid! Alle vragen beantwoord.\nJe score: $" + str(GameManager.score)
 		feedback_label.add_theme_color_override("font_color", Color.GOLD)
 		keyboard_container.visible = false
 		hint_label.text = ""
